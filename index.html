@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#f6d3df" />
+<meta name="description" content="Feira Cultural CSA 2026 — 7º B: um quiz rápido e divertido sobre a Região Centro-Oeste do Brasil." />
+<title>Feira Cultural CSA 2026 • Quiz Centro-Oeste</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="style.css" />
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<div class="ambient ambient-a" aria-hidden="true"></div><div class="ambient ambient-b" aria-hidden="true"></div>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Página inicial Feira Cultural CSA 2026"><span class="brand-symbol">✳</span><span><strong>CSA <em>2026</em></strong><small>FEIRA CULTURAL</small></span></a>
+    <nav class="top-actions" aria-label="Acesso de organização">
+      <span class="edition-pill">✦ EDIÇÃO 7º B</span><button class="music-switch" id="musicToggle" type="button" aria-pressed="false" aria-label="Ligar ou desligar música ambiente">♪ Música: desligada</button>
+      <button class="nav-link" id="adminEntry" type="button">Área de acesso <span aria-hidden="true">↗</span></button>
+    </nav>
+  </header>
+  <main id="mainArea" aria-live="polite"></main>
+  <footer class="footer"><span>Feito com curiosidade pelo <strong>7º B</strong> ✦ CSA</span><span>Região Centro-Oeste · 2026</span></footer>
+</div>
+<dialog id="loginDialog" class="login-dialog" aria-labelledby="loginTitle">
+  <form id="loginForm" class="login-content">
+    <button id="closeLogin" class="modal-close" type="button" aria-label="Fechar">×</button>
+    <span class="eyebrow">ACESSO DA ORGANIZAÇÃO</span>
+    <h2 id="loginTitle">Olá, equipe CSA! <span>✦</span></h2>
+    <p>Entre com a conta autorizada para acompanhar os resultados ou preparar o modo feira.</p>
+    <label for="loginEmail">E-mail</label><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="seu@email.com" />
+    <label for="loginPassword">Senha</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Sua senha" />
+    <p class="form-status" id="loginStatus" role="status"></p>
+    <button id="loginSubmit" class="button button-primary full" type="submit">Entrar na minha conta <span aria-hidden="true">↗</span></button>
+    <small>Acesso reservado aos responsáveis. Visitantes não precisam criar conta.</small>
+  </form>
+</dialog>
+<template id="illustration">
+<svg class="hero-landscape" viewBox="0 0 680 465" role="img" aria-label="Ilustração estilizada do Congresso Nacional de Brasília e paisagem do Cerrado">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE5ED"/><stop offset="1" stop-color="#FAD6CF"/></linearGradient><linearGradient id="pinkHill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EC7FA1"/><stop offset="1" stop-color="#B44973"/></linearGradient><linearGradient id="gold" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#F3D7A4"/><stop offset="1" stop-color="#D39B60"/></linearGradient></defs>
+<circle cx="342" cy="225" r="198" fill="url(#sky)"/><circle cx="476" cy="105" r="43" fill="#F9BE9D" opacity=".8"/>
+<g stroke="#DC8CAA" stroke-width="2" opacity=".72" fill="none"><path d="M113 129l9-11 10 11"/><path d="M526 182l10-12 10 12"/><path d="M475 71l5-5 5 5"/></g>
+<path d="M78 328Q158 270 260 327T457 306T614 334V435H78Z" fill="#F5BDB8"/><path d="M36 376Q155 305 260 369T472 347T647 367V448H36Z" fill="url(#pinkHill)"/><path d="M64 429Q211 380 332 425T626 398V464H64Z" fill="#843855"/>
+<!-- Stylized Congresso Nacional: twin towers and opposing domes -->
+<g transform="translate(194 131)"><ellipse cx="144" cy="221" rx="172" ry="18" fill="#893E5A" opacity=".14"/><path d="M-2 212H303V239H-2Z" fill="#D8B3B9"/><rect x="117" y="12" width="37" height="204" rx="3" fill="#FFF9F6"/><rect x="165" y="12" width="37" height="204" rx="3" fill="#F8EBE8"/><path d="M127 19v189M175 19v189" stroke="#E5D4D0" stroke-width="3"/><path d="M-5 202Q34 144 76 202Z" fill="#FFF7F3" stroke="#D6AEB7" stroke-width="3"/><path d="M226 171Q268 225 307 171Z" fill="#FFF7F3" stroke="#D6AEB7" stroke-width="3"/><path d="M-14 217H313" stroke="#FDF5F1" stroke-width="7" stroke-linecap="round"/></g>
+<!-- stylized cerrado trees -->
+<g fill="none" stroke="#5D5445" stroke-linecap="round"><path d="M123 405v-53l-18-21M123 368l20-25M539 409v-64l-23-17M539 372l23-31" stroke-width="6"/></g><path d="M83 333Q83 297 118 308Q139 275 169 301Q199 310 178 342Q160 354 133 346Q98 359 83 333" fill="#967D65"/><path d="M487 327Q481 291 521 297Q539 271 567 290Q607 304 580 338Q556 350 526 340Q499 351 487 327" fill="#8A755B"/>
+<g fill="#F4C97E"><path d="M168 416q10-20 19 0t20 0"/><path d="M480 431q11-16 20 0t19 0"/></g>
+<g fill="#FFFFFF" opacity=".86"><circle cx="94" cy="197" r="4"/><circle cx="569" cy="260" r="3"/><circle cx="427" cy="66" r="3"/><circle cx="155" cy="88" r="3"/></g>
+</svg>
+</template>
+</body>
+</html>

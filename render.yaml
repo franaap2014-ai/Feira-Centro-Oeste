@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: feira-cultural-csa-2026
+    runtime: static
+    buildCommand: npm run build
+    staticPublishPath: ./dist

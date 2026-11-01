@@ -1,0 +1,20 @@
+name: Validar quiz
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar 40 perguntas e sorteio
+        run: npm test
+      - name: Gerar site estático
+        run: npm run build

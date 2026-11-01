@@ -1,0 +1,10 @@
+{
+  "name": "feira-cultural-csa-2026-centro-oeste",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test.mjs",
+    "build": "npm test && node build.mjs"
+  }
+}
