@@ -47,3 +47,33 @@ export async function fetchAttempts(){
  }
  throw new Error('Limite de consulta atingido; exporte os dados em intervalos menores.');
 }
+
+
+// Authentication uses Supabase Auth; passwords are never stored in this repository.
+export async function createAccount(email,password){
+ if(password.length<10)throw new Error('A senha precisa ter pelo menos 10 caracteres.');
+ return request('/auth/v1/signup',{method:'POST',body:{email,password,options:{emailRedirectTo:window.location.origin+window.location.pathname}}});
+}
+export async function requestPasswordReset(email){
+ return request('/auth/v1/recover?redirect_to='+encodeURIComponent(window.location.origin+window.location.pathname),{method:'POST',body:{email}});
+}
+export async function finishPasswordReset(accessToken,password){
+ if(password.length<10)throw new Error('A nova senha precisa ter pelo menos 10 caracteres.');
+ return request('/auth/v1/user',{method:'PUT',token:accessToken,body:{password}});
+}
+export async function fetchMusicSettings(){
+ const rows=await request('/rest/v1/quiz_music_settings?select=youtube_video_id&id=eq.true&limit=1');
+ return rows?.[0]?.youtube_video_id??null;
+}
+export async function saveMusicSettings(videoId){
+ const token=await getValidToken();
+ if(!token||await getRole()!=='admin')throw new Error('Apenas a conta ADM pode mudar a música.');
+ if(videoId!==null&&!/^[\w-]{11}$/.test(videoId))throw new Error('Link do YouTube inválido.');
+ return request('/rest/v1/quiz_music_settings?id=eq.true',{method:'PATCH',token,prefer:'return=minimal',body:{youtube_video_id:videoId,updated_at:new Date().toISOString()}});
+}
+export async function resetQuestion(id){
+ const token=await getValidToken();
+ if(!token||await getRole()!=='admin')throw new Error('Somente o ADM pode restaurar questões.');
+ if(!/^[GCTVB]\d{2}$/.test(id))throw new Error('Código de questão inválido.');
+ return request('/rest/v1/quiz_question_overrides?id=eq.'+encodeURIComponent(id),{method:'DELETE',token,prefer:'return=minimal'});
+}
