@@ -1,3 +1,5 @@
+import {readFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {questions,categories,validateBank,makeSession,shuffle} from './questions.js';
 assert.equal(validateBank(),true);
@@ -22,3 +24,13 @@ for(let n=0;n<1200;n++){
 assert.equal(seen.size,40);assert.equal(correctPositions.size,4);assert.ok(orders.size>20);
 assert.deepEqual(shuffle([1,2,3,4],()=>0),[2,3,4,1]);
 console.log('✓ 40 questões válidas (8 por tema); 1.200 partidas simuladas; sorteio e respostas aprovados.');
+
+const requiredModules=['app.js','backend.js','music.js','auth-ui.js','admin-music.js','questions.js'];
+const buildSource=readFileSync('build.mjs','utf8');
+for(const file of requiredModules){
+ assert.ok(buildSource.includes("'"+file+"'"),'O build precisa publicar '+file);
+ execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
+}
+const appSource=readFileSync('app.js','utf8');
+assert.ok(appSource.includes("./auth-ui.js")&&appSource.includes("./admin-music.js"));
+console.log('✓ Arquivos novos incluidos no build e sintaxe JavaScript conferida.');

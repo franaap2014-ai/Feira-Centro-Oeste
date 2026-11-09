@@ -6,7 +6,7 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 const publish = [
   'index.html', 'style.css', 'app.js', 'backend.js', 'config.js',
-  'music.js', 'questions.js', 'favicon.svg',
+  'music.js', 'auth-ui.js', 'admin-music.js', 'questions.js', 'favicon.svg',
 ];
 for (const name of publish) {
   await copyFile(new URL(`./${name}`, import.meta.url), new URL(name, dist));
