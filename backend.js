@@ -52,7 +52,7 @@ export async function fetchAttempts(){
 // Authentication uses Supabase Auth; passwords are never stored in this repository.
 export async function createAccount(email,password){
  if(password.length<10)throw new Error('A senha precisa ter pelo menos 10 caracteres.');
- return request('/auth/v1/signup',{method:'POST',body:{email,password,options:{emailRedirectTo:window.location.origin+window.location.pathname}}});
+ return request('/auth/v1/signup?redirect_to='+encodeURIComponent(window.location.origin+window.location.pathname),{method:'POST',body:{email,password}});
 }
 export async function requestPasswordReset(email){
  return request('/auth/v1/recover?redirect_to='+encodeURIComponent(window.location.origin+window.location.pathname),{method:'POST',body:{email}});
