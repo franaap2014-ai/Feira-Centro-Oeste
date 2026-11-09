@@ -35,8 +35,9 @@ export function initAccountUI(){
   try{
    if(mode==='signup'){
     if(password.value.length<10||password.value!==document.getElementById('confirmPassword').value)throw new Error('Use uma senha com pelo menos 10 caracteres e repita-a corretamente.');
-    await createAccount(email.value.trim(),password.value);
-    form.reset();status.textContent='Cadastro solicitado! Confira seu e-mail e clique no link de confirmação. Depois volte para Entrar.';
+    const signupResult=await createAccount(email.value.trim(),password.value);
+    form.reset();
+    status.textContent=(signupResult?.access_token||signupResult?.session?.access_token)?'Conta criada! Clique em Entrar e use o e-mail e a senha cadastrados.':'Cadastro solicitado. Se o Supabase ainda exigir confirmação, será necessário desativar “Confirm email” nas configurações de autenticação.';
    }else if(mode==='recover'){
     await requestPasswordReset(email.value.trim());
     status.textContent='Se esse e-mail estiver cadastrado, você receberá um link para redefinir a senha.';
