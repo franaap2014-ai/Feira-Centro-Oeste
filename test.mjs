@@ -32,7 +32,8 @@ for(const file of requiredModules){
  execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
 }
 const appSource=readFileSync('app.js','utf8');
-assert.ok(appSource.includes("./auth-ui.js")&&appSource.includes("./admin-music.js"));
+assert.ok(appSource.includes("./guest.js")&&appSource.includes("./admin-music.js"));
+assert.ok(readFileSync('guest.js','utf8').includes('initGuestUI'));
 console.log('✓ Arquivos novos incluidos no build e sintaxe JavaScript conferida.');
 
 
