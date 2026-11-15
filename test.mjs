@@ -34,3 +34,15 @@ for(const file of requiredModules){
 const appSource=readFileSync('app.js','utf8');
 assert.ok(appSource.includes("./auth-ui.js")&&appSource.includes("./admin-music.js"));
 console.log('✓ Arquivos novos incluidos no build e sintaxe JavaScript conferida.');
+
+
+// The customizable bank can contain many topics and extra questions.
+const {makeFlexibleSession}=await import('./questions.js');
+for(let i=0;i<1200;i++){
+ const mock=questions.map((q,index)=>({...q,topicId:index%7===0?'topic-1':index%7===1?'topic-2':null,active:true}));
+ const round=makeFlexibleSession(mock);
+ assert.equal(round.length,5);
+ assert.equal(new Set(round.map(q=>q.id)).size,5);
+ for(const q of round)assert.equal(q.answers.filter(a=>a.correct).length,1);
+}
+console.log('✓ 1.200 jogos extras com tópicos personalizados.');

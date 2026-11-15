@@ -84,3 +84,31 @@ export function makeSession(bank = questions, rng = Math.random) {
   return shuffle(chosen,rng);
 }
 validateBank();
+
+
+// O editor permite tópicos livres; o jogo continua sorteando cinco
+// perguntas diferentes. Tenta incluir tópicos diferentes primeiro.
+export function makeFlexibleSession(bank,rng=Math.random){
+ const eligible=bank.filter(q=>q.active!==false&&q.options?.length===4&&q.text?.trim());
+ if(eligible.length<5)throw new Error('O banco precisa de pelo menos cinco perguntas ativas.');
+ const groups=new Map();
+ for(const q of eligible){
+  const key=q.topicId||'sem-topico';
+  if(!groups.has(key))groups.set(key,[]);
+  groups.get(key).push(q);
+ }
+ const selected=[];
+ for(const group of shuffle([...groups.values()],rng)){
+  if(selected.length===5)break;
+  selected.push(group[Math.floor(rng()*group.length)]);
+ }
+ const selectedIds=new Set(selected.map(q=>q.id));
+ for(const q of shuffle(eligible.filter(q=>!selectedIds.has(q.id)),rng)){
+  if(selected.length===5)break;
+  selected.push(q);
+ }
+ return shuffle(selected.map(q=>({
+  ...q,
+  answers:shuffle(q.options.map((text,original)=>({id:q.id+'-'+original,text,correct:original===q.correct})),rng)
+ })),rng);
+}

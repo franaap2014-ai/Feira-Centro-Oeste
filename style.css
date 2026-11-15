@@ -50,3 +50,35 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 .bank-search-wrap input{width:100%;padding:11px;border:1px solid #ecc9d9;border-radius:10px;font-size:13px}
 .bank-item[hidden]{display:none!important}
 @media(max-width:520px){.music-icon{width:38px;height:38px;font-size:23px}.music-panel{right:-72px;max-width:calc(100vw - 32px)}}
+
+
+/* Cadastro dos visitantes e novo editor de tópicos */
+.visitor-area{min-height:65vh;display:grid;place-items:center;padding:38px 0 60px}
+.visitor-card{width:min(100%,540px);padding:clamp(24px,5vw,45px);border:1px solid #f0d5e1;border-radius:26px;background:#fffafd;box-shadow:0 20px 55px #ad538226}
+.visitor-card h1{font-size:clamp(28px,5vw,40px);margin:15px 0}
+.visitor-card>p{color:#8c6c7c;line-height:1.65;margin-bottom:24px}
+.visitor-card .question-editor label{display:flex;flex-direction:column;gap:6px}
+.visitor-card .question-editor button{width:100%}
+.studio-panel{padding:clamp(18px,3vw,30px)}
+.topic-create{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;border:1px solid #f1dae5;background:#fff6fa;border-radius:16px;padding:14px;margin:14px 0}
+.topic-create label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:800;color:#775368;flex:1 1 190px}
+.topic-create label:has(input[type=color]){flex:0 0 66px}
+.topic-create input{min-height:42px;background:#fff;border:1px solid #e7cbd8;border-radius:9px;padding:8px 11px;font:inherit;font-size:13px;color:#493043}
+.topic-create input[type=color]{padding:4px;cursor:pointer;width:64px}
+.topic-create .button,.topic-create .mini-button{min-height:42px;white-space:nowrap}
+.topic-chips{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:21px 0 16px}
+.topic-chip{border:1.5px solid #f0d8e3;background:#fff;padding:9px 13px;border-radius:99px;display:inline-flex;align-items:center;gap:8px;color:#603f53;font-weight:800;font-size:12px;cursor:pointer}
+.topic-chip.active{background:#fff0f6;border-color:var(--topic-color);box-shadow:0 0 0 2px #f8dce9}
+.topic-dot{width:11px;height:11px;display:inline-block;background:var(--topic-color);border-radius:50%}
+.topic-chip small{color:#ac8c9d;font-weight:800}
+.topic-tip{font-size:12px;color:#9b7187;line-height:1.55;margin:8px 0}
+.studio-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:20px 0 14px}
+.studio-toolbar label{font-size:12px;font-weight:800;color:#865875;flex:1 1 180px}
+.studio-toolbar input{margin-top:7px;width:100%;border:1px solid #efcddc;border-radius:11px;padding:12px;font:inherit;font-size:13px;background:#fff}
+.studio-form-title{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.studio-image-preview{border:1px dashed #e6c6d7;border-radius:15px;background:#fffbfd;min-height:75px;display:grid;place-items:center;overflow:hidden;padding:10px}
+.studio-image-preview img{max-height:200px;max-width:100%;object-fit:contain}
+.studio-image-preview small{color:#aa8f9f}
+.studio-empty{padding:35px;border:1px dashed #ecd1df;border-radius:15px}
+.mini-button.danger{color:#aa325f}
+@media(max-width:620px){.topic-create label{flex-basis:100%}.topic-create label:has(input[type=color]){flex-basis:70px}.studio-toolbar .button{width:100%}}
