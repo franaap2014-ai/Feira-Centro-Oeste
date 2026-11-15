@@ -82,3 +82,19 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 .studio-empty{padding:35px;border:1px dashed #ecd1df;border-radius:15px}
 .mini-button.danger{color:#aa325f}
 @media(max-width:620px){.topic-create label{flex-basis:100%}.topic-create label:has(input[type=color]){flex-basis:70px}.studio-toolbar .button{width:100%}}
+
+
+/* Login e cadastro simples de participantes */
+.guest-fields{display:flex;flex-direction:column;gap:0}
+.guest-fields label{display:block;color:#674057;font-size:12px;font-weight:850;margin:12px 0 7px}
+.guest-fields input{width:100%;padding:15px 16px;border:1.5px solid #e8cbda;border-radius:13px;background:#fff;color:#493443;outline-color:#ad386f}
+.guest-fields input:focus-visible{border-color:#b43e79;box-shadow:0 0 0 3px #f6d8e7;outline:none}
+.guest-actions{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:7px}
+.guest-text-action{display:block;width:100%;text-align:center;background:none;border:0;border-radius:10px;color:#ac4377;padding:12px 8px;font-size:13px;cursor:pointer}
+.guest-text-action strong{text-decoration:underline;text-underline-offset:3px}
+.guest-text-action:hover{background:#fbedf3}
+.guest-admin-action{border-top:1px solid #eed9e3;border-radius:0;margin-top:3px;font-weight:850}
+.guest-actions small{font-size:11px;color:#9d8a95;text-align:center;line-height:1.5}
+.guest-welcome{color:#7a536b;padding:15px 0}
+#guestAccountSubmit[hidden]{display:none}
+#guestAccountStatus{min-height:19px}

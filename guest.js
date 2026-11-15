@@ -1,34 +1,101 @@
-import {registerParticipant} from './backend.js';
-const STORAGE_KEY='csa-feira-visitor-2026-v1';
+import {createGuestAccount,loginGuestAccount,logoutGuestAccount,getGuestAccount} from './backend.js';
+const STORAGE_KEY='csa-quiz-user-session-v2';
+let adminAccess=()=>{},onGuestChange=()=>{};
 export function getVisitor(){
  try{
-  const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
-  if(saved&&/^[0-9a-f-]{36}$/i.test(saved.id)&&typeof saved.username==='string')return saved;
+  const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+  if(typeof data?.token==='string'&&/^[a-f0-9]{64}$/.test(data.token)&&
+      /^[a-f0-9-]{36}$/i.test(data.id||'')&&typeof data.username==='string')return data;
  }catch{}
  return null;
 }
-export function clearVisitor(){localStorage.removeItem(STORAGE_KEY)}
-export function showVisitorRegistration(container,onRegistered){
- container.innerHTML='<section class="visitor-area"><div class="visitor-card">'+
-  '<span class="eyebrow">✦ CADASTRO RÁPIDO</span><h1>Antes de começar...</h1>'+
-  '<p>Escolha seu username e informe um e-mail para identificar sua participação. Sem senha e sem confirmação por e-mail.</p>'+
-  '<form id="visitorForm" class="question-editor">'+
-   '<label for="visitorUsername">Seu username</label><input id="visitorUsername" name="username" minlength="2" maxlength="40" required autocomplete="nickname" placeholder="Ex.: Explorador do Cerrado">'+
-   '<label for="visitorEmail">Seu e-mail</label><input id="visitorEmail" name="email" type="email" maxlength="160" required autocomplete="email" placeholder="seu@email.com">'+
-   '<p class="notice">Seu e-mail ficará visível somente para a organização da feira. Como não há verificação, este registro não comprova que você é dono desse e-mail.</p>'+
-   '<div role="status" id="visitorStatus" class="muted"></div>'+
-   '<button class="button button-primary" id="visitorSubmit" type="submit">Cadastrar e jogar ↗</button>'+
-   '<button class="button button-ghost" type="button" id="visitorCancel">Voltar</button>'+
-  '</form></div></section>';
- document.getElementById('visitorCancel').onclick=()=>location.reload();
- document.getElementById('visitorForm').onsubmit=async event=>{
-  event.preventDefault();
-  const status=document.getElementById('visitorStatus'),btn=document.getElementById('visitorSubmit');
-  btn.disabled=true;status.textContent='Cadastrando…';
-  try{
-   const visitor=await registerParticipant(document.getElementById('visitorEmail').value,document.getElementById('visitorUsername').value);
-   localStorage.setItem(STORAGE_KEY,JSON.stringify(visitor));
-   await onRegistered();
-  }catch(error){status.textContent='Não foi possível cadastrar: '+(error.message||'Verifique sua conexão.');btn.disabled=false}
- };
+export function clearVisitor(){
+ const previous=getVisitor();
+ localStorage.removeItem(STORAGE_KEY);
+ if(previous?.token)logoutGuestAccount(previous.token).catch(()=>{});
 }
+function escapeHTML(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]))}
+let afterLogin=()=>{};
+let mode='create';
+function draw(){
+ const dialog=document.getElementById('guestAccessDialog');
+ const form=document.getElementById('guestAccountForm');
+ const title=document.getElementById('guestAccessTitle');
+ const active=getVisitor();
+ const controls=document.getElementById('guestAccountFields');
+ const actions=document.getElementById('guestAccountActions');
+ const submit=document.getElementById('guestAccountSubmit');
+ const status=document.getElementById('guestAccountStatus');
+ status.textContent='';
+ if(active&&mode==='account'){
+  title.textContent='Minha conta';
+  controls.innerHTML='<p class="guest-welcome">Você está conectado como <strong>'+escapeHTML(active.username)+'</strong>.</p>';
+  submit.hidden=true;
+  actions.innerHTML='<button type="button" id="guestPlay" class="button button-primary full">Jogar agora ↗</button>'+
+  '<button type="button" id="guestLogout" class="guest-text-action">Sair da conta</button>'+
+  '<button type="button" id="guestAdmin" class="guest-text-action guest-admin-action">Acesso de ADM</button>';
+  document.getElementById('guestPlay').onclick=()=>{dialog.close();afterLogin()};
+  document.getElementById('guestLogout').onclick=()=>{clearVisitor();mode='create';draw();onGuestChange()};
+  document.getElementById('guestAdmin').onclick=()=>{dialog.close();adminAccess()};
+  return;
+ }
+ const creating=mode==='create';
+ title.textContent=creating?'Criar conta':'Entrar na conta';
+ controls.innerHTML='<label for="guestUsername">Username</label>'+
+ '<input id="guestUsername" name="username" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]{3,24}" required placeholder="Escolha seu username" />'+
+ '<label for="guestPassword">Senha</label>'+
+ '<input id="guestPassword" name="password" type="password" autocomplete="'+(creating?'new-password':'current-password')+'" minlength="10" maxlength="72" required placeholder="Digite sua senha" />'+
+ (creating?'<label for="guestPasswordRepeat">Repetir senha</label>'+
+ '<input id="guestPasswordRepeat" name="confirm" type="password" autocomplete="new-password" minlength="10" maxlength="72" required placeholder="Repita sua senha" />':'');
+ submit.hidden=false;submit.textContent=creating?'Criar':'Entrar';
+ actions.innerHTML='<button type="button" id="guestSwitch" class="guest-text-action">'+
+ (creating?'Já tem uma conta? <strong>Entre</strong>':'Não tem conta? <strong>Criar conta</strong>')+'</button>'+
+ '<button type="button" id="guestAdmin" class="guest-text-action guest-admin-action">Acesso de ADM</button>'+
+ '<small>Cadastro sem e-mail. Guarde sua senha para entrar novamente.</small>';
+ document.getElementById('guestSwitch').onclick=()=>{mode=creating?'login':'create';draw();document.getElementById('guestUsername').focus()};
+ document.getElementById('guestAdmin').onclick=()=>{dialog.close();adminAccess()};
+ document.getElementById('guestUsername').focus();
+}
+export function openGuestAccess(callback){
+ afterLogin=typeof callback==='function'?callback:onGuestChange;
+ mode=getVisitor()?'account':'create';
+ const dialog=document.getElementById('guestAccessDialog');
+ if(!dialog.open)dialog.showModal();
+ draw();
+}
+export function initGuestUI({onAdminAccess,onGuestChanged}={}){
+ adminAccess=typeof onAdminAccess==='function'?onAdminAccess:()=>{};
+ onGuestChange=typeof onGuestChanged==='function'?onGuestChanged:()=>{};
+ const dialog=document.getElementById('guestAccessDialog');
+ if(!dialog)return;
+ document.getElementById('guestClose').onclick=()=>dialog.close();
+ dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close()});
+ document.getElementById('guestAccountForm').onsubmit=async event=>{
+  event.preventDefault();
+  if(mode==='account')return;
+  const username=document.getElementById('guestUsername').value.trim();
+  const password=document.getElementById('guestPassword').value;
+  const button=document.getElementById('guestAccountSubmit'),status=document.getElementById('guestAccountStatus');
+  if(mode==='create'&&password!==document.getElementById('guestPasswordRepeat').value){
+   status.textContent='As senhas não coincidem.';return;
+  }
+  button.disabled=true;status.textContent='Aguarde…';
+  try{
+   const user=mode==='create'?await createGuestAccount(username,password):await loginGuestAccount(username,password);
+   if(!user?.token||!user?.id||!user?.username)throw new Error('Resposta inválida do servidor.');
+   localStorage.setItem(STORAGE_KEY,JSON.stringify({id:user.id,username:user.username,token:user.token}));
+   document.getElementById('guestPassword').value='';
+   const repeat=document.getElementById('guestPasswordRepeat');
+   if(repeat)repeat.value='';
+   dialog.close();
+   onGuestChange();
+   afterLogin();
+  }catch(error){status.textContent=error?.message||'Não foi possível entrar. Confira seus dados.'}
+  finally{button.disabled=false}
+ };
+ const previous=getVisitor();
+ if(previous) getGuestAccount(previous.token).then(data=>{
+  if(!data||data.id!==previous.id){localStorage.removeItem(STORAGE_KEY);onGuestChange()}
+ }).catch(()=>{});
+}
+export function showVisitorRegistration(_container,onRegistered){openGuestAccess(onRegistered)}

@@ -46,3 +46,18 @@ for(let i=0;i<1200;i++){
  for(const q of round)assert.equal(q.answers.filter(a=>a.correct).length,1);
 }
 console.log('✓ 1.200 jogos extras com tópicos personalizados.');
+
+
+// Cadastro comum sem email, separado do painel administrativo.
+const entryHTML=readFileSync('index.html','utf8');
+assert.ok(entryHTML.includes('id="guestAccessDialog"'));
+assert.ok(entryHTML.includes('id="loginDialog"'));
+const guestCode=readFileSync('guest.js','utf8');
+for(const text of ['Criar conta','Repetir senha','Já tem uma conta?','Acesso de ADM','guestPasswordRepeat','quiz_guest_register']){
+ if(text==='quiz_guest_register')assert.ok(readFileSync('backend.js','utf8').includes(text));
+ else assert.ok(guestCode.includes(text),'Cadastro precisa incluir '+text);
+}
+for(const filename of ['guest.js','backend.js']){
+ execFileSync(process.execPath,['--check',filename],{stdio:'pipe'});
+}
+console.log('✓ Cadastro username/senha, repetição, entrada e ADM separados.');

@@ -1,8 +1,8 @@
 import {initMusic} from "./music.js";
-import {initAccountUI} from "./auth-ui.js";
+
 import {renderAdminMusicPanel} from "./admin-music.js";
 import {questions,categories,makeSession,makeFlexibleSession} from './questions.js';
-import {getVisitor,clearVisitor,showVisitorRegistration} from './guest.js';
+import {getVisitor,clearVisitor,openGuestAccess,initGuestUI} from './guest.js';
 import {renderStudio} from './studio.js';
 import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword} from './backend.js';
 const root=document.getElementById('mainArea');
@@ -13,8 +13,8 @@ const state={page:'home',questions:[],answers:[],index:0,busy:false,role:null,em
 const messages=['Não desanime! Que tal tentar novamente?','Boa tentativa! O Centro-Oeste tem muito para ensinar!','Bom trabalho! Continue descobrindo nossa região!','Muito bem! Você sabe bastante sobre o Centro-Oeste!','Excelente! Você conhece muito bem a região!','Incrível! Você é especialista no Centro-Oeste!'];
 function setNav(){
  const btn=document.getElementById('adminEntry');
- btn.textContent=state.role==='admin'?'Painel ADM ↗':state.role==='operator'?'Modo Feira ↗':'Área de acesso ↗';
- btn.onclick=()=>{if(state.role==='admin')showAdmin();else if(state.role==='operator')showOperator();else showLogin()};
+ btn.textContent=state.role==='admin'?'Painel ADM ↗':state.role==='operator'?'Modo Feira ↗':getVisitor()?getVisitor().username+' ↗':'Área de acesso ↗';
+ btn.onclick=()=>{if(state.role==='admin')showAdmin();else if(state.role==='operator')showOperator();else openGuestAccess()};
 }
 const permittedImages=['assets/cerrado.svg','assets/pantanal.svg','assets/pequi.svg','assets/pantaneiro.svg','assets/congresso.svg','assets/cavalhadas.svg'];
 const imageHTML=(q)=>(permittedImages.includes(q.image)||(()=>{try{return new URL(q.image).protocol==='https:'}catch{return false}})())?`<figure class="question-image"><img src="${escapeHTML(q.image)}" alt="Ilustração para a pergunta: ${escapeHTML(q.text)}" loading="eager"><figcaption>Ilustração didática • Centro-Oeste</figcaption></figure>`:'';
@@ -24,7 +24,7 @@ function home(){state.page='home';setNav();root.innerHTML=`<section class="home-
  const visitor=getVisitor();if(visitor&&state.role!=='admin'){const button=document.createElement('button');button.type='button';button.className='button button-ghost';button.textContent='Trocar participante ('+visitor.username+')';button.onclick=()=>{clearVisitor();home()};document.querySelector('.hero-actions')?.appendChild(button)}
 }
 async function start(){
- if(state.role!=='admin'&&!getVisitor()){state.page='register';showVisitorRegistration(root,()=>start());return}
+ if(state.role!=='admin'&&!getVisitor()){openGuestAccess(()=>start());return}
  state.page='loading';root.innerHTML='<p class="notice">Preparando as cinco perguntas…</p>';
  if(configured)try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics}catch(err){console.warn('Usando banco local temporariamente:',err)}
  try{state.questions=makeFlexibleSession(state.bank)}catch(error){root.innerHTML='<p class="notice warning">'+escapeHTML(error.message)+'</p>';return}
@@ -53,7 +53,7 @@ function result(){
  root.innerHTML=`<section class="result-layout"><div class="result-card"><div class="result-emblem" aria-hidden="true">${score>=4?'🏆':score>=2?'✨':'🌸'}</div><span class="eyebrow">✦ MISSÃO CONCLUÍDA</span><h1>Resultado final</h1><div class="result-score">${score}<span> / 5</span></div><p class="result-caption">Você acertou ${score} de 5 perguntas!</p><p class="result-message">${messages[score]}</p><div class="result-actions"><button id="againBtn" class="button button-primary" type="button">Jogar novamente ↗</button><button id="homeBtn" class="button button-ghost" type="button">Página inicial</button></div><p class="saved-msg" id="savedMsg" role="status">${configured?'Registrando sua participação…':'Resultado local: não foi registrado online.'}</p></div><section class="review-panel"><div class="review-title"><span class="eyebrow">✦ CONFIRA SEUS CONHECIMENTOS</span><h2>Seu gabarito</h2><p>Veja o que acertou, o que errou e aprenda um pouco mais.</p></div><div class="review-grid">${reviews}</div></section></section>`;
  document.getElementById('againBtn').onclick=start;document.getElementById('homeBtn').onclick=home;
  const questionSnapshot=state.questions.map(q=>({id:q.id,category:q.category,topicId:q.topicId||null,text:q.text,options:q.options,correct:q.correct,fact:q.fact,image:q.image||null}));
- const attempt={score,questionIds:state.questions.map(q=>q.id),answers:state.answers.map(a=>({question_id:a.question_id,answer_id:a.answer_id,correct:a.correct})),questionSnapshot,mode:state.mode,participantId:state.mode==='fair'?getVisitor()?.id||null:null};
+ const attempt={score,questionIds:state.questions.map(q=>q.id),answers:state.answers.map(a=>({question_id:a.question_id,answer_id:a.answer_id,correct:a.correct})),questionSnapshot,mode:state.mode,participantId:state.mode==='fair'?getVisitor()?.id||null:null,guestToken:state.role==='admin'?null:getVisitor()?.token||null};
  if(configured)saveAttempt(attempt).then(r=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent=r.saved?'✓ Participação registrada com sucesso.':'Pontuação não salva.'}).catch(()=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent='Não foi possível salvar online. O resultado permanece válido.'});
 }
 function showLogin(){
@@ -150,5 +150,5 @@ function exportCSV(){
  const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const csv='\uFEFF'+[['data','tipo','pontuacao','username','email','perguntas','respostas','gabarito_original'],...data].map(line=>line.map(quote).join(';')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='resultados-feira-cultural-csa-2026.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);
 }
-async function init(){initMusic();setNav();home();if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
+async function init(){initGuestUI({onAdminAccess:showLogin,onGuestChanged:home});initMusic();setNav();home();if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
 init();

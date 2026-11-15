@@ -23,17 +23,28 @@
   <main id="mainArea" aria-live="polite"></main>
   <footer class="footer"><span>Feito com curiosidade pelo <strong>7º B</strong> ✦ CSA</span><span>Região Centro-Oeste · 2026</span></footer>
 </div>
+<dialog id="guestAccessDialog" class="login-dialog" aria-labelledby="guestAccessTitle">
+ <form id="guestAccountForm" class="login-content" autocomplete="on">
+  <button type="button" id="guestClose" class="modal-close" aria-label="Fechar">×</button>
+  <span class="eyebrow">✦ FEIRA CULTURAL CSA 2026</span>
+  <h2 id="guestAccessTitle">Criar conta</h2>
+  <div id="guestAccountFields" class="guest-fields"></div>
+  <p id="guestAccountStatus" class="form-status" role="status"></p>
+  <button id="guestAccountSubmit" type="submit" class="button button-primary full">Criar</button>
+  <div id="guestAccountActions" class="guest-actions"></div>
+ </form>
+</dialog>
 <dialog id="loginDialog" class="login-dialog" aria-labelledby="loginTitle">
   <form id="loginForm" class="login-content">
     <button id="closeLogin" class="modal-close" type="button" aria-label="Fechar">×</button>
-    <span class="eyebrow">ACESSO DA ORGANIZAÇÃO</span>
-    <h2 id="loginTitle">Olá, equipe CSA! <span>✦</span></h2>
-    <p>Apenas a conta ADM entra com senha. Visitantes se cadastram com e-mail e username ao clicar em Jogar.</p>
+    <span class="eyebrow">ACESSO DE ADM</span>
+    <h2 id="loginTitle">Entrar como ADM <span>✦</span></h2>
+    <p>Área exclusiva da administração. Entre com o e-mail autorizado e sua senha.</p>
     <label for="loginEmail">E-mail</label><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="seu@email.com" />
     <label for="loginPassword">Senha</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Sua senha" />
     <p class="form-status" id="loginStatus" role="status"></p>
     <button id="loginSubmit" class="button button-primary full" type="submit">Entrar na minha conta <span aria-hidden="true">↗</span></button>
-    <small>Acesso ADM protegido por senha. O cadastro de visitantes é feito antes do quiz.</small>
+    <small>As contas comuns usam username e senha, sem acesso às funções do ADM.</small>
   </form>
 </dialog>
 <template id="illustration">

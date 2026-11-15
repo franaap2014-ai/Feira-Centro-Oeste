@@ -32,9 +32,16 @@ export async function updateQuestion(question){
  const payload={id:question.id,category:question.category,text:question.text,options:question.options,correct:question.correct,fact:question.fact||'',image:question.image||null,updated_at:new Date().toISOString()};
  await request('/rest/v1/quiz_question_overrides?on_conflict=id',{method:'POST',token,prefer:'resolution=merge-duplicates,return=minimal',body:payload});return true;
 }
-export async function saveAttempt({score,questionIds,answers,mode,questionSnapshot,participantId}){
+export async function saveAttempt({score,questionIds,answers,mode,questionSnapshot,participantId,guestToken}){
  if(!configured)return{saved:false};
+ if(mode==='fair'&&guestToken){
+  return guestRpc('quiz_guest_save_attempt',{
+   p_token:guestToken,p_score:score,p_question_ids:questionIds,
+   p_answers:answers,p_question_snapshot:questionSnapshot
+  });
+ }
  const token=await getValidToken();
+ if(!token)throw new Error('Entre na sua conta para registrar o resultado.');
  await request('/rest/v1/quiz_attempts',{method:'POST',token,prefer:'return=minimal',body:{score,question_ids:questionIds,answers,mode,question_snapshot:questionSnapshot,participant_id:participantId||null,created_by:token?session.user.id:null}});
  return{saved:true};
 }
@@ -159,4 +166,25 @@ export async function changeCurrentPassword(password){
  if(typeof password!=='string'||password.length<12)throw new Error('A nova senha precisa de pelo menos 12 caracteres.');
  await request('/auth/v1/user',{method:'PUT',token,body:{password}});
  return true;
+}
+
+
+// Cadastro e login comum por username/senha, separados do Supabase Auth administrativo.
+// O servidor armazena somente um hash bcrypt da senha e um hash do token de sessão.
+async function guestRpc(fn,payload){
+ const result=await request('/rest/v1/rpc/'+fn,{method:'POST',body:payload});
+ if(result?.error)throw new Error(result.error);
+ return result;
+}
+export async function createGuestAccount(username,password){
+ return guestRpc('quiz_guest_register',{p_username:username,p_password:password});
+}
+export async function loginGuestAccount(username,password){
+ return guestRpc('quiz_guest_login',{p_username:username,p_password:password});
+}
+export async function getGuestAccount(token){
+ return guestRpc('quiz_guest_whoami',{p_token:token});
+}
+export async function logoutGuestAccount(token){
+ return guestRpc('quiz_guest_logout',{p_token:token});
 }
