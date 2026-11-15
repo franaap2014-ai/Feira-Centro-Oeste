@@ -98,3 +98,8 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 .guest-welcome{color:#7a536b;padding:15px 0}
 #guestAccountSubmit[hidden]{display:none}
 #guestAccountStatus{min-height:19px}
+
+/* Link de recuperação do acesso administrativo */
+.admin-forgot{align-self:center;border:0;background:transparent;color:#a33d72;font-weight:800;font-size:13px;padding:12px;border-radius:10px;text-decoration:underline;text-underline-offset:3px}
+.admin-forgot:hover,.admin-forgot:focus-visible{background:#fbeaf2}
+.admin-forgot:disabled{opacity:.6;cursor:wait}

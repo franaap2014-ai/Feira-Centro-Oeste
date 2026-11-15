@@ -4,7 +4,7 @@ import {renderAdminMusicPanel} from "./admin-music.js";
 import {questions,categories,makeSession,makeFlexibleSession} from './questions.js';
 import {getVisitor,clearVisitor,openGuestAccess,initGuestUI} from './guest.js';
 import {renderStudio} from './studio.js';
-import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword} from './backend.js';
+import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword,requestPasswordReset,finishPasswordReset} from './backend.js';
 const root=document.getElementById('mainArea');
 const loginDialog=document.getElementById('loginDialog');
 const loginForm=document.getElementById('loginForm');
@@ -65,8 +65,78 @@ loginForm.addEventListener('submit',async e=>{
  submit.disabled=true;st.textContent='Verificando conta...';
  try{const role=await signIn(document.getElementById('loginEmail').value.trim(),document.getElementById('loginPassword').value);if(role!=='admin'&&role!=='operator'){signOut();throw new Error('Esta conta ainda não foi autorizada pelo organizador.');}
  state.role=role;state.mode=role==='admin'?'test':'fair';state.email=document.getElementById('loginEmail').value.trim();loginDialog.close();loginForm.reset();setNav();role==='admin'?showAdmin():showOperator();
- }catch(err){st.textContent=err.message||'Não foi possível entrar.'}finally{submit.disabled=false}
+ }catch(err){const msg=String(err?.message||'');st.textContent=/invalid login credentials|invalid credentials/i.test(msg)?'E-mail ou senha incorretos. Se não souber a senha, use “Esqueci a senha”.':msg||'Não foi possível entrar.'}finally{submit.disabled=false}
 });
+
+function setupAdminPasswordRecovery(){
+ const link=document.getElementById('recoverAdminPassword');
+ if(link)link.addEventListener('click',async()=>{
+  const email=document.getElementById('loginEmail').value.trim();
+  const status=document.getElementById('loginStatus');
+  if(!email||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+   status.textContent='Digite primeiro seu e-mail ADM para receber a recuperação.';document.getElementById('loginEmail').focus();return;
+  }
+  link.disabled=true;status.textContent='Solicitando link de recuperação…';
+  try{
+   await requestPasswordReset(email);
+   status.textContent='Se o e-mail estiver cadastrado, você receberá um link para definir uma nova senha. Confira sua caixa de entrada.';
+  }catch(error){status.textContent='Não foi possível enviar o link: '+(error?.message||'Tente novamente.')}
+  finally{link.disabled=false}
+ });
+ const hash=new URLSearchParams(location.hash.replace(/^#/,''));
+ if(hash.has('error')||hash.has('error_code')){
+  history.replaceState(null,'',location.pathname+location.search);
+  window.setTimeout(()=>{
+   showLogin();
+   document.getElementById('loginStatus').textContent='O link de recuperação expirou ou é inválido. Solicite outro em “Esqueci a senha”.';
+  },0);
+  return;
+ }
+ if(hash.get('type')!=='recovery'||!hash.get('access_token'))return;
+ const token=hash.get('access_token');
+ history.replaceState(null,'',location.pathname+location.search);
+ const dialog=document.createElement('dialog');
+ dialog.className='login-dialog';
+ dialog.setAttribute('aria-labelledby','recoveryDialogTitle');
+ dialog.innerHTML='<form class="login-content" id="adminRecoveryForm">'+
+  '<button class="modal-close" id="recoveryClose" type="button" aria-label="Fechar">×</button>'+
+  '<span class="eyebrow">✦ RECUPERAÇÃO ADM</span>'+
+  '<h2 id="recoveryDialogTitle">Definir nova senha</h2>'+
+  '<p>Crie uma senha nova para o seu acesso ADM. Ela será salva com segurança no Supabase.</p>'+
+  '<label for="newRecoveryPassword">Nova senha</label>'+
+  '<input type="password" id="newRecoveryPassword" autocomplete="new-password" minlength="12" required placeholder="Pelo menos 12 caracteres">'+
+  '<label for="repeatRecoveryPassword">Repetir nova senha</label>'+
+  '<input type="password" id="repeatRecoveryPassword" autocomplete="new-password" minlength="12" required placeholder="Repita a nova senha">'+
+  '<p role="status" class="form-status" id="recoveryStatus"></p>'+
+  '<button class="button button-primary full" id="recoverySubmit" type="submit">Salvar nova senha ↗</button>'+
+  '</form>';
+ document.body.appendChild(dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ dialog.querySelector('#recoveryClose').onclick=close;
+ dialog.addEventListener('click',event=>{if(event.target===dialog)close()});
+ dialog.addEventListener('close',()=>dialog.remove());
+ dialog.querySelector('form').onsubmit=async event=>{
+  event.preventDefault();
+  const secret=dialog.querySelector('#newRecoveryPassword').value;
+  const repeated=dialog.querySelector('#repeatRecoveryPassword').value;
+  const status=dialog.querySelector('#recoveryStatus');
+  if(secret!==repeated){status.textContent='As senhas não coincidem.';return}
+  const btn=dialog.querySelector('#recoverySubmit');
+  btn.disabled=true;status.textContent='Atualizando senha…';
+  try{
+   await finishPasswordReset(token,secret);
+   dialog.querySelector('#newRecoveryPassword').value='';
+   dialog.querySelector('#repeatRecoveryPassword').value='';
+   signOut();
+   close();
+   showLogin();
+   document.getElementById('loginStatus').textContent='✓ Senha redefinida. Entre com o e-mail ADM e sua nova senha.';
+  }catch(error){status.textContent='Não foi possível alterar: '+(error?.message||'O link pode ter expirado.');}
+  finally{btn.disabled=false}
+ };
+ dialog.showModal();
+}
+
 document.getElementById('closeLogin').onclick=()=>loginDialog.close();
 loginDialog.addEventListener('click',e=>{if(e.target===loginDialog)loginDialog.close()});
 function showOperator(){if(state.role!=='operator')return home();state.mode='fair';state.page='operator';root.innerHTML=`<section class="result-layout"><div class="result-card"><div class="result-emblem" aria-hidden="true">🎪</div><span class="eyebrow">✦ ORGANIZAÇÃO DO EVENTO</span><h1>Modo Feira</h1><p class="result-message">O jogo está pronto para receber visitantes. Eles não precisam entrar em nenhuma conta. Os resultados serão registrados como participações da feira.</p><div class="result-actions"><button class="button button-primary" id="kioskStart">Abrir jogo <span aria-hidden="true">↗</span></button><button class="button button-ghost" id="logout">Sair da conta</button></div></div></section>`;document.getElementById('kioskStart').onclick=home;document.getElementById('logout').onclick=logout}
@@ -150,5 +220,5 @@ function exportCSV(){
  const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const csv='\uFEFF'+[['data','tipo','pontuacao','username','email','perguntas','respostas','gabarito_original'],...data].map(line=>line.map(quote).join(';')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='resultados-feira-cultural-csa-2026.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);
 }
-async function init(){initGuestUI({onAdminAccess:showLogin,onGuestChanged:home});initMusic();setNav();home();if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
+async function init(){initGuestUI({onAdminAccess:showLogin,onGuestChanged:home});initMusic();setNav();home();setupAdminPasswordRecovery();if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
 init();

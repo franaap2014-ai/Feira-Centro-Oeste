@@ -62,3 +62,16 @@ for(const filename of ['guest.js','backend.js']){
  execFileSync(process.execPath,['--check',filename],{stdio:'pipe'});
 }
 console.log('✓ Cadastro username/senha, repetição, entrada e ADM separados.');
+
+
+// Recuperação da senha ADM sem expor credenciais no frontend.
+const adminJS=readFileSync('app.js','utf8');
+const adminHTML=readFileSync('index.html','utf8');
+const backendJS=readFileSync('backend.js','utf8');
+assert.ok(adminHTML.includes('id="recoverAdminPassword"'));
+assert.ok(adminJS.includes('setupAdminPasswordRecovery()'));
+assert.ok(adminJS.includes('finishPasswordReset(token,secret)'));
+assert.ok(adminJS.includes('requestPasswordReset(email)'));
+assert.ok(backendJS.includes("'/auth/v1/recover?redirect_to='"));
+assert.ok(!adminHTML.includes('tkDJY%q!vNky4ZKtVZ8FzY'),'Não publicar senhas conhecidas');
+console.log('✓ Recuperação do acesso ADM configurada sem publicar segredos.');
