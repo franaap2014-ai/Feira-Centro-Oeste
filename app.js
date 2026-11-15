@@ -4,7 +4,7 @@ import {renderAdminMusicPanel} from "./admin-music.js";
 import {questions,categories,makeSession,makeFlexibleSession} from './questions.js';
 import {getVisitor,clearVisitor,showVisitorRegistration} from './guest.js';
 import {renderStudio} from './studio.js';
-import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants} from './backend.js';
+import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword} from './backend.js';
 const root=document.getElementById('mainArea');
 const loginDialog=document.getElementById('loginDialog');
 const loginForm=document.getElementById('loginForm');
@@ -17,7 +17,7 @@ function setNav(){
  btn.onclick=()=>{if(state.role==='admin')showAdmin();else if(state.role==='operator')showOperator();else showLogin()};
 }
 const permittedImages=['assets/cerrado.svg','assets/pantanal.svg','assets/pequi.svg','assets/pantaneiro.svg','assets/congresso.svg','assets/cavalhadas.svg'];
-const imageHTML=(q)=>(permittedImages.includes(q.image)||(()=>{try{return new URL(q.image).protocol==='https:'}catch{return false}})())?`<figure class="question-image"><img src="${q.image}" alt="Ilustração para a pergunta: ${escapeHTML(q.text)}" loading="eager"><figcaption>Ilustração didática • Centro-Oeste</figcaption></figure>`:'';
+const imageHTML=(q)=>(permittedImages.includes(q.image)||(()=>{try{return new URL(q.image).protocol==='https:'}catch{return false}})())?`<figure class="question-image"><img src="${escapeHTML(q.image)}" alt="Ilustração para a pergunta: ${escapeHTML(q.text)}" loading="eager"><figcaption>Ilustração didática • Centro-Oeste</figcaption></figure>`:'';
 function svgArt(){return document.getElementById('illustration').innerHTML}
 function home(){state.page='home';setNav();root.innerHTML=`<section class="home-layout" id="inicio"><div class="home-copy"><span class="top-chip">✦ &nbsp; FEIRA CULTURAL CSA 2026 <i>•</i> 7º B</span><h1>Descubra o <span class="highlight">Centro-<span class="serif">Oeste.</span></span></h1><p class="home-description">Teste seus conhecimentos sobre o <strong>Centro-Oeste</strong> em uma viagem rápida por sabores, histórias, lugares e tradições da nossa região!</p><div class="hero-actions"><button id="startBtn" class="button button-primary" type="button">Jogar agora <span aria-hidden="true">↗</span></button><span class="play-note">✦ 5 perguntas · seus tópicos<br>Rápido, divertido e gratuito</span></div><div class="home-bottom"><span>7º B — CSA</span><span class="separator"></span><span>Centro-Oeste</span><span class="separator"></span><span>2026</span></div></div><div class="home-art"><div class="art-panel"><span class="art-doodle doodle-a" aria-hidden="true">✳</span><span class="art-doodle doodle-b" aria-hidden="true">✦</span>${svgArt()}<div class="floating-stamp"><strong>5 desafios</strong><span>uma viagem de descobertas ✦</span></div></div></div></section>`;
  document.getElementById('startBtn').onclick=start;
@@ -71,10 +71,38 @@ document.getElementById('closeLogin').onclick=()=>loginDialog.close();
 loginDialog.addEventListener('click',e=>{if(e.target===loginDialog)loginDialog.close()});
 function showOperator(){if(state.role!=='operator')return home();state.mode='fair';state.page='operator';root.innerHTML=`<section class="result-layout"><div class="result-card"><div class="result-emblem" aria-hidden="true">🎪</div><span class="eyebrow">✦ ORGANIZAÇÃO DO EVENTO</span><h1>Modo Feira</h1><p class="result-message">O jogo está pronto para receber visitantes. Eles não precisam entrar em nenhuma conta. Os resultados serão registrados como participações da feira.</p><div class="result-actions"><button class="button button-primary" id="kioskStart">Abrir jogo <span aria-hidden="true">↗</span></button><button class="button button-ghost" id="logout">Sair da conta</button></div></div></section>`;document.getElementById('kioskStart').onclick=home;document.getElementById('logout').onclick=logout}
 function logout(){signOut();state.role=null;state.email=null;state.mode='fair';home()}
+
+function openPasswordChange(){
+ const dialog=document.createElement('dialog');
+ dialog.className='login-dialog';
+ dialog.setAttribute('aria-labelledby','newPasswordTitle');
+ dialog.innerHTML='<form id="passwordChangeForm" class="login-content"><button id="cancelPassword" class="modal-close" type="button" aria-label="Fechar">×</button>'+
+ '<span class="eyebrow">✦ SEGURANÇA ADM</span><h2 id="newPasswordTitle">Trocar senha</h2>'+
+ '<p>Digite a nova senha. Ela não será publicada no GitHub nem compartilhada com visitantes.</p>'+
+ '<label for="passwordNew">Nova senha</label><input id="passwordNew" type="password" minlength="12" autocomplete="new-password" required>'+
+ '<label for="passwordConfirm">Repita a senha</label><input id="passwordConfirm" type="password" minlength="12" autocomplete="new-password" required>'+
+ '<p id="passwordStatus" role="status" class="form-status"></p>'+
+ '<button id="passwordSave" type="submit" class="button button-primary full">Atualizar senha ↗</button></form>';
+ document.body.appendChild(dialog);dialog.showModal();
+ const close=()=>{dialog.close();dialog.remove()};
+ dialog.querySelector('#cancelPassword').onclick=close;
+ dialog.addEventListener('click',event=>{if(event.target===dialog)close()});
+ dialog.addEventListener('close',()=>dialog.remove());
+ dialog.querySelector('form').onsubmit=async event=>{
+  event.preventDefault();
+  const secret=dialog.querySelector('#passwordNew').value,confirmation=dialog.querySelector('#passwordConfirm').value,st=dialog.querySelector('#passwordStatus'),button=dialog.querySelector('#passwordSave');
+  if(secret!==confirmation){st.textContent='As senhas não coincidem.';return}
+  button.disabled=true;st.textContent='Salvando com segurança…';
+  try{await changeCurrentPassword(secret);dialog.querySelector('#passwordNew').value='';dialog.querySelector('#passwordConfirm').value='';st.textContent='✓ Senha alterada com sucesso. Use a nova senha no próximo login.'}
+  catch(error){st.textContent='Erro ao alterar: '+(error.message||'Tente novamente.')}finally{button.disabled=false}
+ };
+}
+
 async function showAdmin(){
  if(state.role!=='admin')return showLogin();state.page='admin';state.adminTab='results';setNav();
- root.innerHTML=`<section class="admin-layout"><div class="admin-header"><div><span class="eyebrow">✦ ACESSO RESTRITO</span><h1>Painel administrativo</h1><p>Histórico, tópicos coloridos, gabaritos e perguntas personalizadas.</p></div><div class="admin-buttons"><button class="button button-primary" id="testStart">Testar quiz ↗</button><button class="button button-ghost" id="fairStart">Ver jogo</button><button class="button button-ghost" id="refreshBtn">Atualizar dados</button><button class="button button-ghost" id="csvBtn">Exportar CSV</button><button class="button button-ghost" id="logout">Sair</button></div></div><div class="filters admin-tabs"><button class="filter active" id="resultsTab">Resultados</button><button class="filter" id="bankTab">Banco de perguntas</button><button class="filter" id="musicTab">Música ♫</button></div><div id="adminContent"><p class="notice">Carregando dados…</p></div></section>`;
+ root.innerHTML=`<section class="admin-layout"><div class="admin-header"><div><span class="eyebrow">✦ ACESSO RESTRITO</span><h1>Painel administrativo</h1><p>Histórico, tópicos coloridos, gabaritos e perguntas personalizadas.</p></div><div class="admin-buttons"><button class="button button-primary" id="testStart">Testar quiz ↗</button><button class="button button-ghost" id="fairStart">Ver jogo</button><button class="button button-ghost" id="refreshBtn">Atualizar dados</button><button class="button button-ghost" id="csvBtn">Exportar CSV</button><button class="button button-ghost" id="passwordBtn">Trocar senha</button><button class="button button-ghost" id="logout">Sair</button></div></div><div class="filters admin-tabs"><button class="filter active" id="resultsTab">Resultados</button><button class="filter" id="bankTab">Banco de perguntas</button><button class="filter" id="musicTab">Música ♫</button></div><div id="adminContent"><p class="notice">Carregando dados…</p></div></section>`;
  document.getElementById('testStart').onclick=()=>{state.mode='test';start()};document.getElementById('fairStart').onclick=()=>{state.mode='fair';home()};document.getElementById('logout').onclick=logout;
+ document.getElementById('passwordBtn').onclick=openPasswordChange;
  document.getElementById('csvBtn').onclick=exportCSV;document.getElementById('refreshBtn').onclick=()=>refreshAdmin();
  document.getElementById('resultsTab').onclick=()=>{state.adminTab='results';renderAdminContent()};
  document.getElementById('bankTab').onclick=()=>{state.adminTab='questions';renderAdminContent()};

@@ -152,3 +152,11 @@ export async function fetchParticipants(){
  }
  throw new Error('Muitos participantes para uma única consulta.');
 }
+
+
+export async function changeCurrentPassword(password){
+ const token=await requireAdminToken();
+ if(typeof password!=='string'||password.length<12)throw new Error('A nova senha precisa de pelo menos 12 caracteres.');
+ await request('/auth/v1/user',{method:'PUT',token,body:{password}});
+ return true;
+}
