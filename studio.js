@@ -19,10 +19,11 @@ export function renderStudio(host,{bank,topics,onChanged}){
   return '<button type="button" data-topic="'+esc(id)+'" class="topic-chip'+active+'" style="--topic-color:'+goodColor(color)+'"><span class="topic-dot"></span>'+esc(label)+' <small>'+count+'</small></button>';
  };
  const topicTabs=topicButton('all','Todas',bank.length,'#B84D80')+
-  categories.map(cat=>topicButton('cat:'+cat.id,(cat.id==='clima'?'🔒 ':'')+cat.label,bank.filter(q=>q.category===cat.id).length,cat.id==='clima'?'#AF3267':'#C477A1')).join('')+
+  categories.map(cat=>topicButton('cat:'+cat.id,(cat.id==='clima'?'🔒 ':'')+cat.label,cat.id==='pontos_turisticos'?10:bank.filter(q=>q.category===cat.id).length,cat.id==='clima'?'#AF3267':'#C477A1')).join('')+
   topicButton('none','Sem tópico',bank.filter(q=>!q.topicId).length,'#B3A0A9')+
   topics.map(t=>topicButton(t.id,t.title,bank.filter(q=>q.topicId===t.id).length,t.color)).join('');
  const topic=lookup.get(topicFilter);
+ const pendingTourism=topicFilter==='cat:pontos_turisticos'&&bank.filter(q=>q.category==='pontos_turisticos').length===0;
  const topicManage=topic?'<form id="editTopicForm" class="topic-create"><label>Nome do tópico<input id="topicEditTitle" required maxlength="70" value="'+esc(topic.title)+'"></label><label>Cor<input id="topicEditColor" type="color" value="'+goodColor(topic.color)+'"></label><button class="mini-button" type="submit">Salvar tópico</button><button id="removeTopicBtn" class="mini-button danger" type="button">Excluir tópico</button></form>':'<p class="topic-tip">Crie um tópico e depois selecione-o na lista acima para colocar perguntas nele.</p>';
  const items=visible.map(q=>'<button type="button" class="bank-item'+(q.id===selectedId&&!creating?' active':'')+'" data-question="'+esc(q.id)+'"><strong>'+esc(q.id.slice(0,6))+'</strong><span>'+esc(q.text)+'</span>'+(q.image?' ▣':'')+'</button>').join('');
  const topicSelect='<select id="editorTopic">'+
@@ -50,7 +51,7 @@ export function renderStudio(host,{bank,topics,onChanged}){
    .replace(/<(textarea|input|select)\b/g,'<$1 disabled')
    .replace(/<div class="editor-actions">[\s\S]*?<\/div><\/form>$/,'</div>');
  }
- host.innerHTML='<section class="admin-panel studio-panel"><div class="panel-title"><div><h2>Banco de perguntas</h2><p class="muted">Você cria seus tópicos, escolhe a cor e organiza as perguntas como quiser.</p></div><span class="score-pill">'+bank.length+' QUESTÕES</span></div>'+
+ host.innerHTML='<section class="admin-panel studio-panel">'+(pendingTourism?'<div class="notice">📍 <strong>10 perguntas reservadas para Pontos Turísticos.</strong> Essas perguntas serão planejadas e aprovadas antes de entrar no quiz.</div>':'')+<div class="panel-title"><div><h2>Banco de perguntas</h2><p class="muted">Você cria seus tópicos, escolhe a cor e organiza as perguntas como quiser.</p></div><span class="score-pill">'+bank.length+' QUESTÕES</span></div>'+
   '<form id="newTopicForm" class="topic-create"><label>Novo tópico<input required id="newTopicTitle" maxlength="70" placeholder="Ex.: Biomas"></label><label>Cor<input id="newTopicColor" type="color" value="#CB6E9B"></label><button class="button button-ghost" type="submit">+ Criar tópico</button></form>'+
   '<div class="topic-chips" aria-label="Tópicos">'+topicTabs+'</div>'+topicManage+
   '<div class="studio-toolbar"><label for="studioSearch">Buscar pergunta<input id="studioSearch" type="search" placeholder="Pesquise pelo enunciado..." value="'+esc(search)+'"></label><button type="button" class="button button-primary" id="newQuestionBtn">+ Nova pergunta</button></div>'+

@@ -10,7 +10,7 @@ const root=document.getElementById('mainArea');
 const loginDialog=document.getElementById('loginDialog');
 const loginForm=document.getElementById('loginForm');
 const escapeHTML=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={page:'home',questions:[],answers:[],index:0,busy:false,role:null,email:null,mode:'fair',attempts:[],topics:[],participants:[],filter:'fair',bank:questions.map(q=>({...q,options:[...q.options]})),bankReady:false,adminTab:'results',categoryFilter:'all',selectedQuestion:'G01',pageNumber:0,bankWarning:''};
+const state={page:'home',questions:[],answers:[],index:0,busy:false,role:null,email:null,mode:'fair',attempts:[],topics:[],participants:[],filter:'fair',bank:questions.map(q=>({...q,options:[...q.options]})),bankReady:false,adminTab:'results',categoryFilter:'all',selectedQuestion:'CL01',pageNumber:0,bankWarning:''};
 const messages=['Não desanime! Que tal tentar novamente?','Boa tentativa! O Centro-Oeste tem muito para ensinar!','Bom trabalho! Continue descobrindo nossa região!','Muito bem! Você sabe bastante sobre o Centro-Oeste!','Excelente! Você conhece muito bem a região!','Incrível! Você é especialista no Centro-Oeste!'];
 function setNav(){
  const btn=document.getElementById('adminEntry');
@@ -34,7 +34,7 @@ function home(){
  const regionCards=region.map((r,i)=>`<article class="atlas-scene atlas-scene-${r.id}"><img src="${r.image}" alt="Ilustração de ${escapeHTML(r.name)}" loading="lazy" width="230" height="154"><div><small>${String(i+1).padStart(2,'0')} / ${r.subtitle}</small><h3>${escapeHTML(r.name)}</h3><p>${escapeHTML(r.description)}</p></div></article>`).join('');
  const themeCards=categories.map((c,i)=>{
   const count=questions.filter(q=>q.category===c.id).length;
-  return `<article class="atlas-topic"><div class="atlas-topic-top"><span class="atlas-topic-icon">${escapeHTML(c.icon)}</span><span class="atlas-topic-num">${String(i+1).padStart(2,'0')}</span></div><h3>${escapeHTML(c.label)}</h3><p>${escapeHTML(c.subtitle)}</p><span class="atlas-topic-count">${count} perguntas ${c.id==='clima'?'· protegidas 🔒':''}</span></article>`;
+  return `<article class="atlas-topic"><div class="atlas-topic-top"><span class="atlas-topic-icon">${escapeHTML(c.icon)}</span><span class="atlas-topic-num">${String(i+1).padStart(2,'0')}</span></div><h3>${escapeHTML(c.label)}</h3><p>${escapeHTML(c.subtitle)}</p><span class="atlas-topic-count">${count===0?'10 em planejamento':count+' perguntas'+(c.id==='clima'?' · protegidas 🔒':'')}</span></article>`;
  }).join('');
  root.innerHTML=`
  <div class="atlas-home" id="inicio">
@@ -59,28 +59,28 @@ function home(){
   </section>
   <p class="atlas-photo-credit">Foto: <a href="https://commons.wikimedia.org/wiki/File:Pantanal,_Mato_Grosso,_Brasil.jpg" target="_blank" rel="noopener noreferrer">Filipefrazao / Wikimedia Commons, CC BY-SA 3.0</a>.</p>
   <section class="atlas-metrics" aria-label="Informações do jogo">
-   <div><b>${questions.length}</b><span>perguntas no banco</span></div>
+   <div><b>30</b><span>perguntas planejadas</span></div>
+   <div><b>${questions.length}</b><span>prontas para jogar</span></div>
    <div><b>05</b><span>por partida</span></div>
-   <div><b>${categories.length.toString().padStart(2,'0')}</b><span>temas para conhecer</span></div>
-   <div><b>20</b><span>de Clima e Biomas</span></div>
+   <div><b>10</b><span>de Pontos Turísticos em planejamento</span></div>
   </section>
   <section class="atlas-explore" aria-labelledby="atlas-explore-title">
    <div class="atlas-section-head"><div><span>01 · DESCUBRA A REGIÃO</span><h2 id="atlas-explore-title">Entre rios, <em>sabores e tradições.</em></h2></div><p>A cultura do Centro-Oeste nasce de sua natureza, de seus povos e de suas paisagens.</p></div>
    <div class="atlas-scenes">${regionCards}</div>
   </section>
   <section class="atlas-themes" id="temas" aria-labelledby="atlas-themes-title">
-   <div class="atlas-section-head"><div><span>02 · O CONHECIMENTO É A VIAGEM</span><h2 id="atlas-themes-title">Sete temas, <em>mil descobertas.</em></h2></div><p>Em cada partida, cinco perguntas diferentes — incluindo Clima e Biomas e Vegetação.</p></div>
+   <div class="atlas-section-head"><div><span>02 · O CONHECIMENTO É A VIAGEM</span><h2 id="atlas-themes-title">Três temas, <em>30 descobertas.</em></h2></div><p>10 de Clima e 10 de Biomas já estão prontas. Vamos planejar as 10 perguntas de Pontos Turísticos.</p></div>
    <div class="atlas-topic-grid">${themeCards}</div>
   </section>
   <section class="atlas-how" id="como-jogar" aria-labelledby="atlas-how-title">
    <div class="atlas-how-main"><span>03 · SUA VEZ DE PARTICIPAR</span><h2 id="atlas-how-title">Preparado para <em>essa viagem?</em></h2><p>Descubra o Centro-Oeste em um quiz com cinco perguntas por partida.</p><button class="atlas-cta" id="startBottomBtn" type="button">Quero jogar <span aria-hidden="true">↗</span></button></div>
    <div class="atlas-how-steps">
     <div><b>01</b><span><strong>Entre uma vez</strong><small>O site mantém sua conta conectada neste aparelho.</small></span></div>
-    <div><b>02</b><span><strong>Responda cinco perguntas</strong><small>Uma de Clima, uma de Biomas e outras três variadas.</small></span></div>
+    <div><b>02</b><span><strong>Responda cinco perguntas</strong><small>Cinco dos dois temas disponíveis; Pontos Turísticos entra após o planejamento.</small></span></div>
     <div><b>03</b><span><strong>Veja seu resultado</strong><small>Confira seus acertos e experimente outra rodada.</small></span></div>
    </div>
   </section>
-  <p class="atlas-endline">✺ FEIRA CULTURAL CSA 2026 · CENTRO-OESTE · 7º ANO B</p>
+  <p class="atlas-endline">✺ 20 PRONTAS · 10 DE PONTOS TURÍSTICOS EM PLANEJAMENTO · 7º B</p>
  </div>`;
  document.getElementById('startBtn').onclick=start;
  document.getElementById('startBottomBtn').onclick=start;

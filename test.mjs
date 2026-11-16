@@ -3,15 +3,15 @@ import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {questions,categories,validateBank,makeSession,shuffle} from './questions.js';
 assert.equal(validateBank(),true);
-assert.equal(questions.length,40);
-assert.equal(new Set(questions.map(q=>q.id)).size,40);
-for(const category of categories){assert.equal(questions.filter(q=>q.category===category.id).length,['clima','biomas_vegetacao'].includes(category.id)?10:4)}
+assert.equal(questions.length,20);
+assert.equal(new Set(questions.map(q=>q.id)).size,20);
+for(const category of categories){assert.equal(questions.filter(q=>q.category===category.id).length,category.id==='pontos_turisticos'?0:10)}
 for(const q of questions){assert.equal(q.options.length,4);assert.ok(q.correct>=0&&q.correct<=3);assert.equal(new Set(q.options).size,4)}
 const seen=new Set(); const correctPositions=new Set(); const orders=new Set();
 for(let n=0;n<1200;n++){
  const session=makeSession();
  assert.equal(session.length,5);
- assert.equal(new Set(session.map(q=>q.category)).size,5);
+ assert.equal(new Set(session.map(q=>q.category)).size,2);
  assert.equal(new Set(session.map(q=>q.id)).size,5);
  for(const q of session){
   const answer=q.answers.find(a=>a.correct);
@@ -21,7 +21,7 @@ for(let n=0;n<1200;n++){
  }
  orders.add(session.map(q=>q.category).join(','));
 }
-assert.equal(seen.size,40);assert.equal(correctPositions.size,4);assert.ok(orders.size>20);
+assert.equal(seen.size,20);assert.equal(correctPositions.size,4);assert.ok(orders.size>=5);
 assert.deepEqual(shuffle([1,2,3,4],()=>0),[2,3,4,1]);
 console.log('✓ 40 questões válidas; 1.200 partidas simuladas; sorteio e respostas aprovados.');
 
@@ -115,18 +115,18 @@ console.log('✓ Google Neon verifica identidade antes de liberar criação da s
 
 
 // O Pantanal substitui Brasília no tema e na ilustração inicial.
-assert.equal(categories.length,7);
-assert.equal(categories[6].id,'pantanal');
-assert.equal(categories[6].label,'Pantanal');
-assert.equal(questions.filter(q=>q.category==='pantanal').length,4);
+assert.equal(categories.length,3);
+assert.equal(categories[2].id,'pontos_turisticos');
+assert.equal(categories[2].label,'Pontos Turísticos');
+assert.equal(questions.filter(q=>q.category==='pontos_turisticos').length,0);
 assert.equal(questions.filter(q=>q.category==='brasilia').length,0);
 assert.ok(readFileSync('index.html','utf8').includes('Paisagem do Pantanal com tuiuiú'));
 assert.ok(!readFileSync('index.html','utf8').includes('Congresso Nacional de Brasília e paisagem'));
-assert.ok(appSource.includes('categories.length'));
+assert.ok(appSource.includes('prontas para jogar'));
 for(let i=0;i<1000;i++){
  const round=makeFlexibleSession(questions);
  assert.equal(round.length,5);
- assert.equal(new Set(round.map(q=>q.category)).size,5);
+ assert.equal(new Set(round.map(q=>q.category)).size,2);
 }
 console.log('✓ Cinco perguntas por partida e sete temas, incluindo Clima e Biomas.');
 
@@ -136,7 +136,7 @@ assert.ok(appSource.includes('class="atlas-hero"'));
 assert.ok(appSource.includes('id="startBtn"'));
 assert.ok(appSource.includes('id="startBottomBtn"'));
 assert.ok(appSource.includes('id="como-jogar"'));
-assert.ok(appSource.includes('Sete temas'));
+assert.ok(appSource.includes('Três temas'));
 assert.ok(appSource.includes('Pantanal'));
 assert.ok(readFileSync('style.css','utf8').includes('HOME V5'));
 assert.ok(readFileSync('index.html','utf8').includes('topbar topbar-v3'));
@@ -180,9 +180,9 @@ for(const [idx,[text,options,correct]] of [["Qual é a vegetação predominante 
 for(let i=0;i<1200;i++){
  const round=makeFlexibleSession(questions);
  assert.equal(round.length,5);
- assert.equal(round.filter(q=>q.category==='clima').length,1);
- assert.equal(round.filter(q=>q.category==='biomas_vegetacao').length,1);
- assert.equal(new Set(round.map(q=>q.category)).size,5);
+ assert.ok(round.some(q=>q.category==='clima'));
+ assert.ok(round.some(q=>q.category==='biomas_vegetacao'));
+ assert.equal(new Set(round.map(q=>q.category)).size,2);
 }
 console.log('✓ As 10 novas questões de Biomas e Vegetação, os 10 gabaritos e a seleção de 5 perguntas foram conferidos.');
 
@@ -191,5 +191,21 @@ assert.ok(appSource.includes('id="atlas-title"'));
 assert.ok(appSource.includes('id="atlasSignOut"'));
 assert.ok(appSource.includes('id="startBtn"')&&appSource.includes('id="startBottomBtn"'));
 assert.ok(appSource.includes('id="como-jogar"'));
-assert.ok(readFileSync('index.html','utf8').includes('40 perguntas e 7 temas'));
+assert.ok(readFileSync('index.html','utf8').includes('30 perguntas planejadas'));
 console.log('✓ Nova tela inicial Atlas do Centro-Oeste, sete temas, login e ações preservadas.');
+
+
+const {BANK_TARGET,TOURISM_RESERVED_IDS}=await import('./questions.js');
+assert.equal(BANK_TARGET,30);
+assert.deepEqual(TOURISM_RESERVED_IDS,['PT01','PT02','PT03','PT04','PT05','PT06','PT07','PT08','PT09','PT10']);
+assert.deepEqual(questions.map(q=>q.id),['CL01','CL02','CL03','CL04','CL05','CL06','CL07','CL08','CL09','CL10','BV01','BV02','BV03','BV04','BV05','BV06','BV07','BV08','BV09','BV10']);
+const approvedTourismFixture=TOURISM_RESERVED_IDS.map((id,i)=>({id,category:'pontos_turisticos',text:'Questão de teste '+i,options:['A','B','C','D'],correct:0}));
+assert.equal(validateBank([...questions,...approvedTourismFixture]),true);
+for(let n=0;n<500;n++){
+ const round=makeFlexibleSession([...questions,...approvedTourismFixture]);
+ assert.equal(round.length,5);
+ for(const cat of categories)assert.ok(round.some(q=>q.category===cat.id));
+}
+assert.ok(appSource.includes('de Pontos Turísticos em planejamento'));
+assert.ok(readFileSync('studio.js','utf8').includes('10 perguntas reservadas para Pontos Turísticos'));
+console.log('✓ Apenas Clima, Biomas e Pontos Turísticos; 20 reais e 10 reservas sem alternativas inventadas.');
