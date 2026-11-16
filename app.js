@@ -67,9 +67,10 @@ function setAdminMode(mode){
  document.getElementById('loginPassword').required=!creating;
  document.getElementById('loginTitle').textContent=creating?'Para ADM':'Entrar como ADM';
  document.getElementById('loginIntro').textContent=creating?
-  'Escolha sua senha diretamente no site. Só uma sessão ADM autorizada pode salvá-la.':
+  'Escolha sua senha aqui depois de abrir seu link privado do Supabase. Não precisa receber e-mail.':
   'Entre com a senha cadastrada para o administrador.';
  document.getElementById('loginSubmit').textContent=creating?'Salvar senha ADM ↗':'Entrar no painel ADM ↗';
+ document.getElementById('adminFirstAccessHelp').hidden=!creating;
  document.getElementById('toggleAdminMode').textContent=creating?'Já tenho senha — Entrar':'Voltar para criar senha';
  document.getElementById('loginStatus').textContent='';
 }
@@ -92,7 +93,7 @@ loginForm.addEventListener('submit',async event=>{
    const first=document.getElementById('admCreatePassword').value;
    const second=document.getElementById('admCreateConfirm').value;
    if(first!==second)throw new Error('As senhas não coincidem.');
-   if(await getRole()!=='admin')throw new Error('É necessário estar autenticado como ADM para criar ou alterar a senha. Digitar apenas o Gmail não autoriza a troca.');
+   if(await getRole()!=='admin')throw new Error('No primeiro acesso, use “Gerar link privado no Supabase” e abra o link que ele criar. Você não precisa de e-mail de recuperação.');
    await changeCurrentPassword(first);
    document.getElementById('admCreatePassword').value='';
    document.getElementById('admCreateConfirm').value='';

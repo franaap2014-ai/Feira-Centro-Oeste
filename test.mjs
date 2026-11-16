@@ -94,3 +94,11 @@ assert.ok(adminJS.includes("if(await getRole()!=='admin')"));
 assert.ok(adminJS.includes('await changeCurrentPassword(first)'));
 assert.ok(adminJS.includes("setAdminMode('login')"));
 console.log('✓ Email, criar senha, confirmar senha e acesso ADM com permissão verificada.');
+
+
+// Instruções de primeira configuração utilizam o painel privado, não um link de email.
+assert.ok(adminHTML.includes('id="adminFirstAccessHelp"'));
+assert.ok(adminHTML.includes('db3212e6-dd45-4dbd-8e18-e5dc8e9bc3c6'));
+assert.ok(adminJS.includes("document.getElementById('adminFirstAccessHelp').hidden=!creating"));
+assert.ok(adminJS.includes('Gerar link privado no Supabase'));
+console.log('✓ Primeira configuração ADM acessível diretamente pelo Supabase.');

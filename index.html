@@ -40,7 +40,7 @@
   <button id="closeLogin" type="button" class="modal-close" aria-label="Fechar">×</button>
   <span class="eyebrow">✦ ACESSO RESTRITO</span>
   <h2 id="loginTitle">Para ADM</h2>
-  <p id="loginIntro">Crie sua senha aqui no site. Para salvar, você precisa estar autorizado como administrador.</p>
+  <p id="loginIntro">Crie sua senha aqui no site, após obter uma autorização única no painel privado do Supabase. Não é necessário receber e-mail.</p>
   <label for="loginEmail">Email</label>
   <input id="loginEmail" type="email" autocomplete="username" value="Franaap2014@gmail.com" readonly required />
   <div class="adm-form-fields" id="admCreateFields">
@@ -52,6 +52,12 @@
   <div class="adm-form-fields" id="admLoginFields" hidden>
     <label for="loginPassword">Senha</label>
     <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Sua senha ADM" />
+  </div>
+  <div id="adminFirstAccessHelp" class="admin-first-access">
+   <strong>Primeiro acesso? Ative sua senha sem e-mail</strong>
+   <p>Abra o painel Supabase com a conta dona do projeto, execute a consulta salva e abra o link privado que aparecer. Ele vale por 15 minutos e leva diretamente à tela de criação de senha.</p>
+   <a href="https://supabase.com/dashboard/project/ejnkyxgbvrmqvhzhnpke/explorer/notebook/db3212e6-dd45-4dbd-8e18-e5dc8e9bc3c6" target="_blank" rel="noopener noreferrer" class="admin-first-link">Gerar link privado no Supabase ↗</a>
+   <small>Não compartilhe o link gerado. Ele só pode ser usado uma vez.</small>
   </div>
   <p id="loginStatus" class="form-status" role="status"></p>
   <button id="loginSubmit" type="submit" class="button button-primary full">Salvar senha ADM ↗</button>

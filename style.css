@@ -118,3 +118,13 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 .adm-form-fields{display:flex;flex-direction:column;gap:10px}
 .adm-form-fields[hidden]{display:none!important}
 #loginEmail[readonly],#adminSetupEmail[readonly]{background:#f9edf3;color:#6c4d60;cursor:default}
+
+
+/* Primeiro acesso ADM sem depender de email, usando acesso privado ao Supabase */
+.admin-first-access{background:#fff5f9;border:1px solid #efd3e0;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:9px;margin:8px 0 3px;color:#754b65}
+.admin-first-access[hidden]{display:none!important}
+.admin-first-access strong{font-size:13px}
+.admin-first-access p{font-size:12px;margin:0!important;line-height:1.6}
+.admin-first-access small{font-size:11px;text-align:left;color:#90778b;margin:0}
+.admin-first-link{display:inline-flex;justify-content:center;align-items:center;min-height:42px;border:1px solid #b94b83;background:#fff;color:#943862;padding:10px 13px;border-radius:11px;font-size:12px;font-weight:850;text-decoration:none;text-align:center}
+.admin-first-link:hover,.admin-first-link:focus-visible{background:#f9e2ed}
