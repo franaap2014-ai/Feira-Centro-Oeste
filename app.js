@@ -4,7 +4,7 @@ import {renderAdminMusicPanel} from "./admin-music.js";
 import {questions,categories,makeSession,makeFlexibleSession} from './questions.js';
 import {getVisitor,clearVisitor,openGuestAccess,initGuestUI} from './guest.js';
 import {renderStudio} from './studio.js';
-import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword,requestPasswordReset,finishPasswordReset} from './backend.js';
+import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword,saveAdminSetupPassword} from './backend.js';
 const root=document.getElementById('mainArea');
 const loginDialog=document.getElementById('loginDialog');
 const loginForm=document.getElementById('loginForm');
@@ -56,116 +56,60 @@ function result(){
  const attempt={score,questionIds:state.questions.map(q=>q.id),answers:state.answers.map(a=>({question_id:a.question_id,answer_id:a.answer_id,correct:a.correct})),questionSnapshot,mode:state.mode,participantId:state.mode==='fair'?getVisitor()?.id||null:null,guestToken:state.role==='admin'?null:getVisitor()?.token||null};
  if(configured)saveAttempt(attempt).then(r=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent=r.saved?'✓ Participação registrada com sucesso.':'Pontuação não salva.'}).catch(()=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent='Não foi possível salvar online. O resultado permanece válido.'});
 }
-let adminLoginMode='setup';
-function setAdminLoginMode(mode){
- adminLoginMode=mode==='login'?'login':'setup';
- const entering=adminLoginMode==='login';
- document.getElementById('loginTitle').innerHTML=entering?'Entrar como ADM <span>✦</span>':'Criar senha de ADM <span>✦</span>';
- document.getElementById('loginIntro').textContent=entering?
-  'Entre com o e-mail autorizado e a senha que você criou.':
-  'Digite o e-mail autorizado. Enviaremos um link seguro para você criar sua própria senha.';
- document.getElementById('adminPasswordFields').hidden=!entering;
- const pw=document.getElementById('loginPassword');pw.required=entering;
- if(!entering)pw.value='';
- document.getElementById('loginSubmit').innerHTML=entering?'Entrar na minha conta <span aria-hidden="true">↗</span>':'Criar minha senha <span aria-hidden="true">↗</span>';
- document.getElementById('toggleAdminLogin').textContent=entering?'Criar minha senha':'Já tenho senha — Entrar';
- document.getElementById('recoverAdminPassword').hidden=!entering;
- document.getElementById('loginStatus').textContent='';
-}
-function showLogin(mode='setup'){
- if(!configured){loginDialog.showModal();document.getElementById('loginStatus').textContent='O banco de autenticação está indisponível. Tente novamente mais tarde.';return}
- setAdminLoginMode(mode);
- if(!loginDialog.open)loginDialog.showModal();
- document.getElementById('loginEmail').focus();
-}
-document.getElementById('toggleAdminLogin').onclick=()=>setAdminLoginMode(adminLoginMode==='login'?'setup':'login');
-loginForm.addEventListener('submit',async e=>{
- e.preventDefault();
- const submit=document.getElementById('loginSubmit'),st=document.getElementById('loginStatus');
- const email=document.getElementById('loginEmail').value.trim();
- submit.disabled=true;
- try{
-  if(adminLoginMode==='setup'){
-   st.textContent='Enviando link seguro para criar sua senha…';
-   await requestPasswordReset(email);
-   st.textContent='Se o e-mail for o da conta ADM autorizada, você receberá um link para criar uma senha. Abra o e-mail, escolha a senha e depois volte para entrar.';
-   return;
-  }
-  st.textContent='Verificando conta…';
-  const role=await signIn(email,document.getElementById('loginPassword').value);
-  if(role!=='admin'&&role!=='operator'){
-   signOut();
-   throw new Error('Esta conta não possui acesso administrativo.');
-  }
-  state.role=role;
-  state.mode=role==='admin'?'test':'fair';
-  state.email=email;
-  loginDialog.close();
-  loginForm.reset();
-  setNav();
-  role==='admin'?showAdmin():showOperator();
- }catch(err){
-  const msg=String(err?.message||'');
-  st.textContent=/invalid login credentials|invalid credentials/i.test(msg)?
-   'Senha incorreta. Toque em “Esqueci a senha” para criar outra.':
-   msg||'Não foi possível concluir.';
- }finally{submit.disabled=false}
-});
-function setupAdminPasswordRecovery(){
- const link=document.getElementById('recoverAdminPassword');
- if(link)link.addEventListener('click',()=>setAdminLoginMode('setup'));
- const hash=new URLSearchParams(location.hash.replace(/^#/,''));
- if(hash.has('error')||hash.has('error_code')){
-  history.replaceState(null,'',location.pathname+location.search);
-  window.setTimeout(()=>{
-   showLogin();
-   document.getElementById('loginStatus').textContent='O link de recuperação expirou ou é inválido. Solicite outro em “Esqueci a senha”.';
-  },0);
+function showLogin(){
+ if(!configured){
+  if(!loginDialog.open)loginDialog.showModal();
+  document.getElementById('loginStatus').textContent='Banco de autenticação indisponível.';
   return;
  }
- if(hash.get('type')!=='recovery'||!hash.get('access_token'))return;
- const token=hash.get('access_token');
+ document.getElementById('loginStatus').textContent='';
+ if(!loginDialog.open)loginDialog.showModal();
+ document.getElementById('loginPassword').focus();
+}
+loginForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const btn=document.getElementById('loginSubmit'),status=document.getElementById('loginStatus');
+ btn.disabled=true;status.textContent='Verificando acesso ADM…';
+ try{
+  const role=await signIn(document.getElementById('loginEmail').value,document.getElementById('loginPassword').value);
+  if(role!=='admin'){signOut();throw new Error('Esta conta não possui acesso ADM.')}
+  state.role='admin';state.mode='test';state.email=document.getElementById('loginEmail').value;
+  loginDialog.close();loginForm.reset();setNav();showAdmin();
+ }catch(error){
+  const message=String(error?.message||'');
+  status.textContent=/invalid login credentials|invalid credentials/i.test(message)?
+   'Senha incorreta. Confira a senha escolhida ou use seu link privado de configuração.':
+   message||'Não foi possível entrar.';
+ }finally{btn.disabled=false}
+});
+function setupPrivateAdminPasswordScreen(){
+ const params=new URLSearchParams(location.hash.slice(1));
+ const setupToken=params.get('adm_setup');
+ if(!setupToken)return;
  history.replaceState(null,'',location.pathname+location.search);
- const dialog=document.createElement('dialog');
- dialog.className='login-dialog';
- dialog.setAttribute('aria-labelledby','recoveryDialogTitle');
- dialog.innerHTML='<form class="login-content" id="adminRecoveryForm">'+
-  '<button class="modal-close" id="recoveryClose" type="button" aria-label="Fechar">×</button>'+
-  '<span class="eyebrow">✦ RECUPERAÇÃO ADM</span>'+
-  '<h2 id="recoveryDialogTitle">Definir nova senha</h2>'+
-  '<p>Crie uma senha nova para o seu acesso ADM. Ela será salva com segurança no Supabase.</p>'+
-  '<label for="newRecoveryPassword">Nova senha</label>'+
-  '<input type="password" id="newRecoveryPassword" autocomplete="new-password" minlength="12" required placeholder="Pelo menos 12 caracteres">'+
-  '<label for="repeatRecoveryPassword">Repetir nova senha</label>'+
-  '<input type="password" id="repeatRecoveryPassword" autocomplete="new-password" minlength="12" required placeholder="Repita a nova senha">'+
-  '<p role="status" class="form-status" id="recoveryStatus"></p>'+
-  '<button class="button button-primary full" id="recoverySubmit" type="submit">Salvar nova senha ↗</button>'+
-  '</form>';
- document.body.appendChild(dialog);
- const close=()=>{dialog.close();dialog.remove()};
- dialog.querySelector('#recoveryClose').onclick=close;
- dialog.addEventListener('click',event=>{if(event.target===dialog)close()});
- dialog.addEventListener('close',()=>dialog.remove());
- dialog.querySelector('form').onsubmit=async event=>{
-  event.preventDefault();
-  const secret=dialog.querySelector('#newRecoveryPassword').value;
-  const repeated=dialog.querySelector('#repeatRecoveryPassword').value;
-  const status=dialog.querySelector('#recoveryStatus');
-  if(secret!==repeated){status.textContent='As senhas não coincidem.';return}
-  const btn=dialog.querySelector('#recoverySubmit');
-  btn.disabled=true;status.textContent='Atualizando senha…';
-  try{
-   await finishPasswordReset(token,secret);
-   dialog.querySelector('#newRecoveryPassword').value='';
-   dialog.querySelector('#repeatRecoveryPassword').value='';
-   signOut();
-   close();
-   showLogin('login');
-   document.getElementById('loginStatus').textContent='✓ Senha criada. Entre com o e-mail ADM e sua nova senha.';
-  }catch(error){status.textContent='Não foi possível alterar: '+(error?.message||'O link pode ter expirado.');}
-  finally{btn.disabled=false}
- };
+ const dialog=document.getElementById('adminSetupDialog');
+ const form=document.getElementById('adminSetupForm');
+ const status=document.getElementById('adminSetupStatus');
  dialog.showModal();
+ document.getElementById('adminSetupClose').onclick=()=>dialog.close();
+ form.onsubmit=async event=>{
+  event.preventDefault();
+  const password=document.getElementById('adminSetupPassword').value;
+  const repeated=document.getElementById('adminSetupConfirm').value;
+  if(password!==repeated){status.textContent='As duas senhas precisam ser iguais.';return}
+  const submit=document.getElementById('adminSetupSubmit');
+  submit.disabled=true;status.textContent='Salvando senha com segurança…';
+  try{
+   await saveAdminSetupPassword(setupToken,password);
+   form.reset();
+   dialog.close();
+   signOut();
+   showLogin();
+   document.getElementById('loginStatus').textContent='✓ Senha criada! Agora entre com a senha que você acabou de escolher.';
+  }catch(error){
+   status.textContent=String(error?.message||'Não foi possível criar a senha.');
+  }finally{submit.disabled=false}
+ };
 }
 
 document.getElementById('closeLogin').onclick=()=>loginDialog.close();
@@ -251,5 +195,5 @@ function exportCSV(){
  const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const csv='\uFEFF'+[['data','tipo','pontuacao','username','email','perguntas','respostas','gabarito_original'],...data].map(line=>line.map(quote).join(';')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='resultados-feira-cultural-csa-2026.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);
 }
-async function init(){initGuestUI({onAdminAccess:showLogin,onGuestChanged:home});initMusic();setNav();home();setupAdminPasswordRecovery();if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
+async function init(){initGuestUI({onAdminAccess:showLogin,onGuestChanged:home});initMusic();setNav();home();setupPrivateAdminPasswordScreen();if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
 init();

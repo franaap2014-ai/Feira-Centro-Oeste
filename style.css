@@ -108,3 +108,8 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 #adminPasswordFields[hidden]{display:none!important}
 #adminPasswordFields{display:flex;flex-direction:column;gap:10px}
 #loginDialog .admin-forgot[hidden]{display:none!important}
+
+/* Formulário interno de criação de senha ADM */
+#adminSetupDialog .login-content {gap:12px}
+#adminSetupDialog .login-content h2 {font-size:clamp(27px,5vw,36px)}
+#adminSetupDialog .login-content input {width:100%}

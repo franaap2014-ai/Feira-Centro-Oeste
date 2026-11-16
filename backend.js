@@ -188,3 +188,21 @@ export async function getGuestAccount(token){
 export async function logoutGuestAccount(token){
  return guestRpc('quiz_guest_logout',{p_token:token});
 }
+
+
+// Configuração privada, única e temporária do ADM: nenhum link de email.
+export async function saveAdminSetupPassword(setupToken,password){
+ if(!configured)throw new Error('O banco de dados não está conectado.');
+ if(!/^[a-f0-9]{64}$/.test(setupToken||''))throw new Error('Seu link de configuração não é válido.');
+ const bytes=new TextEncoder().encode(password||'').length;
+ if(typeof password!=='string'||password.length<12||password.length>72||bytes>72)
+  throw new Error('Use uma senha de 12 a 72 caracteres.');
+ const response=await fetch(root+'/functions/v1/admin-password-setup',{
+  method:'POST',
+  headers:{'Content-Type':'application/json','apikey':key},
+  body:JSON.stringify({token:setupToken,password})
+ });
+ const body=await response.json().catch(()=>null);
+ if(!response.ok||body?.success!==true)throw new Error(body?.error||'Falha ao definir a senha. Solicite um novo link privado.');
+ return true;
+}

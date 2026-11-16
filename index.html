@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="referrer" content="no-referrer" />
 <meta name="theme-color" content="#f6d3df" />
 <meta name="description" content="Feira Cultural CSA 2026 — 7º B: um quiz rápido e divertido sobre a Região Centro-Oeste do Brasil." />
 <title>Feira Cultural CSA 2026 • Quiz Centro-Oeste</title>
@@ -35,21 +36,33 @@
  </form>
 </dialog>
 <dialog id="loginDialog" class="login-dialog" aria-labelledby="loginTitle">
-  <form id="loginForm" class="login-content">
-    <button id="closeLogin" class="modal-close" type="button" aria-label="Fechar">×</button>
-    <span class="eyebrow">ACESSO DE ADM</span>
-    <h2 id="loginTitle">Criar senha de ADM <span>✦</span></h2>
-    <p id="loginIntro">Digite o e-mail autorizado. Você receberá um link seguro para escolher sua senha, sem precisar de uma senha pré-definida.</p>
-    <label for="loginEmail">E-mail</label><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="seu@email.com" value="Franaap2014@gmail.com" />
-    <div id="adminPasswordFields" hidden>
-      <label for="loginPassword">Senha</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" />
-    </div>
-    <p class="form-status" id="loginStatus" role="status"></p>
-    <button id="loginSubmit" class="button button-primary full" type="submit">Criar minha senha <span aria-hidden="true">↗</span></button>
-    <button id="toggleAdminLogin" type="button" class="admin-forgot">Já tenho senha — Entrar</button>
-    <button id="recoverAdminPassword" type="button" class="admin-forgot" hidden>Esqueci a senha</button>
-    <small>As contas comuns usam username e senha, sem acesso às funções do ADM.</small>
-  </form>
+ <form id="loginForm" class="login-content">
+  <button id="closeLogin" type="button" class="modal-close" aria-label="Fechar">×</button>
+  <span class="eyebrow">✦ ÁREA RESTRITA</span>
+  <h2 id="loginTitle">Acesso de ADM</h2>
+  <p>Entre com a senha que você criou. Apenas a administração pode acessar este painel.</p>
+  <input id="loginEmail" type="hidden" value="Franaap2014@gmail.com" />
+  <label for="loginPassword">Senha</label>
+  <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Sua senha ADM" />
+  <p id="loginStatus" class="form-status" role="status"></p>
+  <button id="loginSubmit" type="submit" class="button button-primary full">Entrar no painel ADM ↗</button>
+  <small>A senha é verificada pelo Supabase e não aparece no código público.</small>
+ </form>
+</dialog>
+<dialog id="adminSetupDialog" class="login-dialog" aria-labelledby="adminSetupTitle">
+ <form id="adminSetupForm" class="login-content">
+  <button id="adminSetupClose" type="button" class="modal-close" aria-label="Fechar">×</button>
+  <span class="eyebrow">✦ CONFIGURAÇÃO PRIVADA</span>
+  <h2 id="adminSetupTitle">Criar senha</h2>
+  <p>Escolha a senha do ADM. Você não precisa receber nenhum e-mail.</p>
+  <label for="adminSetupPassword">Criar senha</label>
+  <input id="adminSetupPassword" type="password" minlength="12" required autocomplete="new-password" placeholder="Pelo menos 12 caracteres" />
+  <label for="adminSetupConfirm">Confirme sua senha</label>
+  <input id="adminSetupConfirm" type="password" minlength="12" required autocomplete="new-password" placeholder="Digite a senha novamente" />
+  <p id="adminSetupStatus" class="form-status" role="status"></p>
+  <button id="adminSetupSubmit" type="submit" class="button button-primary full">Salvar senha ↗</button>
+  <small>Este acesso é protegido por um link privado e temporário, que só funciona uma vez.</small>
+ </form>
 </dialog>
 <template id="illustration">
 <svg class="hero-landscape" viewBox="0 0 680 465" role="img" aria-label="Ilustração estilizada do Congresso Nacional de Brasília e paisagem do Cerrado">
