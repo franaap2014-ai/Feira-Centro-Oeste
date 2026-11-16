@@ -71,7 +71,7 @@ const backendJS=readFileSync('backend.js','utf8');
 for(const name of ['adminSetupDialog','adminSetupPassword','adminSetupConfirm','adminSetupSubmit']){
  assert.ok(adminHTML.includes('id="'+name+'"'),name+' ausente no formulário');
 }
-assert.ok(adminHTML.includes('Criar senha'));
+assert.ok(adminHTML.includes('Crie sua senha'));
 assert.ok(adminHTML.includes('Confirme sua senha'));
 assert.ok(adminJS.includes("params.get('adm_setup')"));
 assert.ok(adminJS.includes("await saveAdminSetupPassword(setupToken,password)"));
