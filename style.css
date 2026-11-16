@@ -340,3 +340,19 @@ body{background:#fffdfd;color:var(--v3-ink)}
 /* Tema de Pontos Turísticos reservado até termos 10 perguntas aprovadas. */
 .atlas-topic:last-child{border:1px dashed #d7b1c1;background:#fff5fa}
 .atlas-topic:last-child .atlas-topic-count{color:#a04574;font-weight:900}
+
+/* Banco oficial fechado: consulta e gabaritos somente leitura */
+.closed-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.closed-search{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:850;color:#865b6f;margin:13px 0 20px}
+.closed-search input{border:1px solid #e6c9d5;border-radius:12px;padding:13px;font:inherit;background:#fff;outline-color:#ac3e73}
+.closed-question-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.closed-question{padding:19px;border-radius:16px;border:1px solid #efdce5;background:#fffafc}
+.closed-question-top{display:flex;align-items:center;flex-wrap:wrap;gap:9px;font-size:11px;color:#996583}
+.closed-question-top strong{margin-left:auto;color:#a43f71}
+.closed-question h3{font-size:15px;line-height:1.5;color:#52394a;margin:15px 0}
+.closed-answers{list-style:none;padding:0;display:grid;gap:7px;margin:0}
+.closed-answers li{padding:9px 11px;border:1px solid #f0e1e8;border-radius:10px;background:white;font-size:12px;line-height:1.5}
+.closed-answers li b{color:#a84371;margin-right:6px}
+.closed-answers li.correct{background:#f1faf4;border-color:#b8daca;color:#245d41}
+.closed-answers li.correct strong{color:#23774b;font-size:10px}
+@media(max-width:750px){.closed-question-grid{grid-template-columns:1fr}.closed-question{padding:15px}}
