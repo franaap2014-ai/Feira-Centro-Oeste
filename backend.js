@@ -206,3 +206,26 @@ export async function saveAdminSetupPassword(setupToken,password){
  if(!response.ok||body?.success!==true)throw new Error(body?.error||'Falha ao definir a senha. Solicite um novo link privado.');
  return true;
 }
+
+
+// Atualiza a senha da conta ADM existente, com identidade Google validada
+// no servidor pela assinatura criptográfica do Neon Auth.
+export async function setAdminPasswordFromGoogle(neonJwt,password){
+ if(!configured)throw new Error('Banco de autenticação indisponível.');
+ if(typeof neonJwt!=='string'||neonJwt.split('.').length!==3)throw new Error('Verifique sua conta Google antes de criar a senha.');
+ const bytes=new TextEncoder().encode(password||'').length;
+ if(typeof password!=='string'||password.length<12||password.length>72||bytes>72)
+  throw new Error('A senha precisa ter de 12 a 72 caracteres.');
+ const response=await fetch(root+'/functions/v1/admin-google-password',{
+  method:'POST',
+  headers:{
+   'Content-Type':'application/json',
+   'apikey':key,
+   'Authorization':'Bearer '+neonJwt
+  },
+  body:JSON.stringify({password})
+ });
+ const payload=await response.json().catch(()=>null);
+ if(!response.ok||payload?.success!==true)throw new Error(payload?.error||'Não foi possível salvar a senha. Tente confirmar pelo Google novamente.');
+ return true;
+}

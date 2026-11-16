@@ -128,3 +128,11 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 .admin-first-access small{font-size:11px;text-align:left;color:#90778b;margin:0}
 .admin-first-link{display:inline-flex;justify-content:center;align-items:center;min-height:42px;border:1px solid #b94b83;background:#fff;color:#943862;padding:10px 13px;border-radius:11px;font-size:12px;font-weight:850;text-decoration:none;text-align:center}
 .admin-first-link:hover,.admin-first-link:focus-visible{background:#f9e2ed}
+
+
+/* Verificação Google (Neon Auth) antes de criar a senha administrativa */
+#verifyAdminGoogle{width:100%;cursor:pointer;font-size:13px}
+#verifyAdminGoogle[hidden]{display:none!important}
+#verifyAdminGoogle:disabled{opacity:.65;cursor:wait}
+#googleVerifyStatus{display:block;line-height:1.55;font-weight:600}
+#admCreatePassword:disabled,#admCreateConfirm:disabled{background:#f7f1f5;color:#9d8c95;cursor:not-allowed}

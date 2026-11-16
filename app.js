@@ -4,7 +4,8 @@ import {renderAdminMusicPanel} from "./admin-music.js";
 import {questions,categories,makeSession,makeFlexibleSession} from './questions.js';
 import {getVisitor,clearVisitor,openGuestAccess,initGuestUI} from './guest.js';
 import {renderStudio} from './studio.js';
-import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword,saveAdminSetupPassword} from './backend.js';
+import {configured,activeSession,getRole,signIn,signOut,saveAttempt,fetchAttempts,fetchOverrides,updateQuestion,loadQuizData,fetchParticipants,changeCurrentPassword,saveAdminSetupPassword,setAdminPasswordFromGoogle} from './backend.js';
+import {startGoogleVerification,checkGoogleVerification} from './neon-google.js';
 const root=document.getElementById('mainArea');
 const loginDialog=document.getElementById('loginDialog');
 const loginForm=document.getElementById('loginForm');
@@ -57,6 +58,46 @@ function result(){
  if(configured)saveAttempt(attempt).then(r=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent=r.saved?'✓ Participação registrada com sucesso.':'Pontuação não salva.'}).catch(()=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent='Não foi possível salvar online. O resultado permanece válido.'});
 }
 let admMode='create';
+let googleProof=null;
+let verifySequence=0;
+function googleState({verified=false,message='' }={}){
+ const status=document.getElementById('googleVerifyStatus');
+ const googleButton=document.getElementById('verifyAdminGoogle');
+ const createAllowed=verified||state.role==='admin';
+ document.getElementById('admCreatePassword').disabled=!createAllowed;
+ document.getElementById('admCreateConfirm').disabled=!createAllowed;
+ document.getElementById('loginSubmit').disabled=admMode==='create'&&!createAllowed;
+ googleButton.hidden=createAllowed;
+ status.textContent=message||(createAllowed?'✓ Identidade confirmada. Crie sua senha.':'Primeiro confirme a identidade com o Google.');
+}
+async function refreshGoogle(){
+ const generation=++verifySequence;
+ const status=document.getElementById('googleVerifyStatus');
+ if(await getRole()==='admin'){
+  if(generation===verifySequence)googleState({verified:true,message:'✓ Sua sessão ADM já está autorizada.'});
+  return;
+ }
+ status.textContent='Verificando a sessão Google…';
+ try{
+  const result=await checkGoogleVerification();
+  if(generation!==verifySequence||admMode!=='create')return;
+  if(result.status==='verified'){
+   googleProof=result.token;
+   googleState({verified:true,message:'✓ Google confirmado: '+result.email});
+   document.getElementById('admCreatePassword').focus();
+  }else if(result.status==='wrong_account'){
+   googleProof=null;
+   googleState({message:'O Google conectado não corresponde ao e-mail ADM autorizado. Escolha o Gmail correto.'});
+  }else{
+   googleProof=null;
+   googleState({message:'Para liberar a criação da senha, toque em “Entrar com Google”.'});
+  }
+ }catch(error){
+  if(generation!==verifySequence)return;
+  googleProof=null;
+  googleState({message:'Não foi possível conferir o Google: '+(error.message||'Tente novamente.')});
+ }
+}
 function setAdminMode(mode){
  admMode=mode==='login'?'login':'create';
  const creating=admMode==='create';
@@ -67,39 +108,58 @@ function setAdminMode(mode){
  document.getElementById('loginPassword').required=!creating;
  document.getElementById('loginTitle').textContent=creating?'Para ADM':'Entrar como ADM';
  document.getElementById('loginIntro').textContent=creating?
-  'Escolha sua senha aqui depois de abrir seu link privado do Supabase. Não precisa receber e-mail.':
-  'Entre com a senha cadastrada para o administrador.';
+  'Confirme sua conta Google uma vez e escolha sua senha aqui, sem e-mail de recuperação.':
+  'Entre com a senha que você criou para o administrador.';
  document.getElementById('loginSubmit').textContent=creating?'Salvar senha ADM ↗':'Entrar no painel ADM ↗';
  document.getElementById('adminFirstAccessHelp').hidden=!creating;
  document.getElementById('toggleAdminMode').textContent=creating?'Já tenho senha — Entrar':'Voltar para criar senha';
  document.getElementById('loginStatus').textContent='';
+ if(creating){
+  googleState({verified:false});
+  refreshGoogle();
+ }else{
+  document.getElementById('loginSubmit').disabled=false;
+ }
 }
 function showLogin(mode='create'){
  if(!loginDialog.open)loginDialog.showModal();
  setAdminMode(mode);
  if(!configured){document.getElementById('loginStatus').textContent='O banco de autenticação está indisponível.';return}
- document.getElementById(mode==='login'?'loginPassword':'admCreatePassword').focus();
+ if(mode==='login')document.getElementById('loginPassword').focus();
 }
 document.getElementById('toggleAdminMode').onclick=()=>{
  setAdminMode(admMode==='create'?'login':'create');
- document.getElementById(admMode==='create'?'admCreatePassword':'loginPassword').focus();
+ if(admMode==='login')document.getElementById('loginPassword').focus();
+};
+document.getElementById('verifyAdminGoogle').onclick=async()=>{
+ const button=document.getElementById('verifyAdminGoogle');
+ const status=document.getElementById('googleVerifyStatus');
+ button.disabled=true;status.textContent='Abrindo a verificação segura do Google…';
+ try{await startGoogleVerification()}
+ catch(error){status.textContent=String(error.message||'Não foi possível abrir o Google.');button.disabled=false}
 };
 loginForm.addEventListener('submit',async event=>{
  event.preventDefault();
  const btn=document.getElementById('loginSubmit'),status=document.getElementById('loginStatus');
- btn.disabled=true;status.textContent='Verificando autorização…';
+ btn.disabled=true;status.textContent='Verificando acesso…';
  try{
   if(admMode==='create'){
    const first=document.getElementById('admCreatePassword').value;
    const second=document.getElementById('admCreateConfirm').value;
    if(first!==second)throw new Error('As senhas não coincidem.');
-   if(await getRole()!=='admin')throw new Error('No primeiro acesso, use “Gerar link privado no Supabase” e abra o link que ele criar. Você não precisa de e-mail de recuperação.');
-   await changeCurrentPassword(first);
+   if(await getRole()==='admin'){
+    await changeCurrentPassword(first);
+   }else{
+    const identity=await checkGoogleVerification();
+    if(identity.status!=='verified')throw new Error('Primeiro confirme seu Gmail ADM com o botão “Entrar com Google”.');
+    await setAdminPasswordFromGoogle(identity.token,first);
+   }
    document.getElementById('admCreatePassword').value='';
    document.getElementById('admCreateConfirm').value='';
+   googleProof=null;
    signOut();state.role=null;state.email=null;setNav();
    setAdminMode('login');
-   status.textContent='✓ Senha salva com segurança. Agora entre com ela.';
+   status.textContent='✓ Senha criada com sucesso. Entre com ela no painel ADM.';
    return;
   }
   status.textContent='Verificando login ADM…';
@@ -112,8 +172,11 @@ loginForm.addEventListener('submit',async event=>{
   status.textContent=/invalid login credentials|invalid credentials/i.test(message)?
    'Senha incorreta. Confira a senha cadastrada.':
    message||'Não foi possível concluir.';
- }finally{btn.disabled=false}
+ }finally{
+  btn.disabled=admMode==='create'?!googleProof&&state.role!=='admin':false;
+ }
 });
+
 function openAdminPasswordForm(setupToken=null){
  const dialog=document.getElementById('adminSetupDialog');
  const form=document.getElementById('adminSetupForm');
@@ -235,5 +298,12 @@ function exportCSV(){
  const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const csv='\uFEFF'+[['data','tipo','pontuacao','username','email','perguntas','respostas','gabarito_original'],...data].map(line=>line.map(quote).join(';')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='resultados-feira-cultural-csa-2026.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);
 }
-async function init(){initGuestUI({onAdminAccess:showLogin,onGuestChanged:home});initMusic();setNav();home();setupPrivateAdminPasswordScreen();if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
+async function init(){initGuestUI({onAdminAccess:showLogin,onGuestChanged:home});initMusic();setNav();home();setupPrivateAdminPasswordScreen();
+ const callback=new URL(location.href);
+ if(callback.searchParams.get('adm_google')==='1'){
+  callback.searchParams.delete('adm_google');
+  history.replaceState(null,'',callback.pathname+callback.search+callback.hash);
+  showLogin('create');
+ }
+ if(!configured)return;try{const loaded=await loadQuizData(questions);state.bank=loaded.bank;state.topics=loaded.topics;state.bankReady=true;}catch(err){console.warn('Sem acesso ao banco online de perguntas; usando padrão local.',err)}try{const s=activeSession();if(!s)return;const role=await getRole();if(role==='admin'||role==='operator'){state.role=role;state.mode=role==='admin'?'test':'fair';state.email=s.user?.email||null;setNav()}}catch{signOut()}}
 init();

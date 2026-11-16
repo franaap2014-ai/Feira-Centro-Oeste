@@ -90,15 +90,25 @@ assert.ok(adminHTML.includes('id="admCreateConfirm"'));
 const admSection=adminHTML.slice(adminHTML.indexOf('<dialog id="loginDialog"'),adminHTML.indexOf('<dialog id="adminSetupDialog"'));
 assert.ok(admSection.indexOf('for="loginEmail"')<admSection.indexOf('for="admCreatePassword"'));
 assert.ok(admSection.indexOf('for="admCreatePassword"')<admSection.indexOf('for="admCreateConfirm"'));
-assert.ok(adminJS.includes("if(await getRole()!=='admin')"));
+assert.ok(adminJS.includes("if(await getRole()==='admin')"));
 assert.ok(adminJS.includes('await changeCurrentPassword(first)'));
 assert.ok(adminJS.includes("setAdminMode('login')"));
 console.log('✓ Email, criar senha, confirmar senha e acesso ADM com permissão verificada.');
 
 
-// Instruções de primeira configuração utilizam o painel privado, não um link de email.
+// Novo acesso: identidade Google validada pelo Neon e senha salva via Supabase Auth.
 assert.ok(adminHTML.includes('id="adminFirstAccessHelp"'));
-assert.ok(adminHTML.includes('db3212e6-dd45-4dbd-8e18-e5dc8e9bc3c6'));
-assert.ok(adminJS.includes("document.getElementById('adminFirstAccessHelp').hidden=!creating"));
-assert.ok(adminJS.includes('Gerar link privado no Supabase'));
-console.log('✓ Primeira configuração ADM acessível diretamente pelo Supabase.');
+assert.ok(adminHTML.includes('id="verifyAdminGoogle"'));
+assert.ok(adminHTML.includes('Entrar com Google'));
+assert.ok(adminJS.includes('checkGoogleVerification()'));
+assert.ok(adminJS.includes('await setAdminPasswordFromGoogle(identity.token,first)'));
+assert.ok(backendJS.includes("'/functions/v1/admin-google-password'"));
+assert.ok(!adminHTML.includes('db3212e6-dd45-4dbd-8e18-e5dc8e9bc3c6'));
+assert.ok(!adminHTML.includes('localhost:3000'));
+const neonSource=readFileSync('neon-google.js','utf8');
+assert.ok(neonSource.includes('@neon/auth@0.8.2'));
+assert.ok(neonSource.includes('signIn.social'));
+assert.ok(neonSource.includes("status:'wrong_account'"));
+assert.ok(buildSource.includes("'neon-google.js'"));
+execFileSync(process.execPath,['--check','neon-google.js'],{stdio:'pipe'});
+console.log('✓ Google Neon verifica identidade antes de liberar criação da senha ADM.');
