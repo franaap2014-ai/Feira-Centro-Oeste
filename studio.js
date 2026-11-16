@@ -1,4 +1,5 @@
 import {saveTopic,removeTopic,saveBankQuestion,removeBankQuestion,resetQuestion} from './backend.js';
+import {categories,isFixedClimateQuestion} from './questions.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const goodColor=v=>/^#[a-f0-9]{6}$/i.test(v||'')?v:'#B84D80';
 const safeImage=src=>{
@@ -10,7 +11,7 @@ let topicFilter='all',selectedId=null,creating=false,search='';
 function errorStatus(message){const node=document.getElementById('studioStatus');if(node)node.textContent=message}
 export function renderStudio(host,{bank,topics,onChanged}){
  const lookup=new Map(topics.map(t=>[t.id,t]));
- const visible=bank.filter(q=>(topicFilter==='all'||(topicFilter==='none'&&!q.topicId)||q.topicId===topicFilter)&&q.text.toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR')));
+ const visible=bank.filter(q=>(topicFilter==='all'||(topicFilter==='none'&&!q.topicId)||q.topicId===topicFilter||(topicFilter.startsWith('cat:')&&q.category===topicFilter.slice(4)))&&q.text.toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR')));
  const question=creating?{id:null,text:'',options:['','','',''],correct:0,fact:'',image:'',topicId:lookup.has(topicFilter)?topicFilter:null,isOriginal:false,active:true}:visible.find(q=>q.id===selectedId)||visible[0];
  if(question&&!creating)selectedId=question.id;
  const topicButton=(id,label,count,color)=>{
@@ -18,6 +19,7 @@ export function renderStudio(host,{bank,topics,onChanged}){
   return '<button type="button" data-topic="'+esc(id)+'" class="topic-chip'+active+'" style="--topic-color:'+goodColor(color)+'"><span class="topic-dot"></span>'+esc(label)+' <small>'+count+'</small></button>';
  };
  const topicTabs=topicButton('all','Todas',bank.length,'#B84D80')+
+  categories.map(cat=>topicButton('cat:'+cat.id,(cat.id==='clima'?'🔒 ':'')+cat.label,bank.filter(q=>q.category===cat.id).length,cat.id==='clima'?'#AF3267':'#C477A1')).join('')+
   topicButton('none','Sem tópico',bank.filter(q=>!q.topicId).length,'#B3A0A9')+
   topics.map(t=>topicButton(t.id,t.title,bank.filter(q=>q.topicId===t.id).length,t.color)).join('');
  const topic=lookup.get(topicFilter);
@@ -25,9 +27,10 @@ export function renderStudio(host,{bank,topics,onChanged}){
  const items=visible.map(q=>'<button type="button" class="bank-item'+(q.id===selectedId&&!creating?' active':'')+'" data-question="'+esc(q.id)+'"><strong>'+esc(q.id.slice(0,6))+'</strong><span>'+esc(q.text)+'</span>'+(q.image?' ▣':'')+'</button>').join('');
  const topicSelect='<select id="editorTopic">'+
   '<option value="">Sem tópico</option>'+topics.map(t=>'<option value="'+esc(t.id)+'"'+(question?.topicId===t.id?' selected':'')+'>'+esc(t.title)+'</option>').join('')+'</select>';
+ const locked=Boolean(question?.fixed||isFixedClimateQuestion(question));
  const currentImage=safeImage(question?.image);
  const imagePreview=currentImage?'<img src="'+esc(currentImage)+'" alt="Prévia da imagem desta pergunta" loading="lazy">':'<small>Sem imagem cadastrada.</small>';
- const form=question?'<form id="studioQuestionForm" class="question-editor">'+
+ let form=question?'<form id="studioQuestionForm" class="question-editor">'+
   '<div class="studio-form-title"><h3>'+(creating?'Nova pergunta':'Editar '+esc(question.id))+'</h3>'+(creating?'<span class="score-pill">NOVO</span>':'')+'</div>'+
   '<label for="editorTopic">Tópico desta pergunta</label>'+topicSelect+
   '<label for="editorText">Enunciado</label><textarea id="editorText" rows="3" maxlength="400" required>'+esc(question.text)+'</textarea>'+
@@ -42,6 +45,11 @@ export function renderStudio(host,{bank,topics,onChanged}){
   (creating?'<button class="button button-ghost" type="button" id="cancelNewQuestion">Cancelar</button>':
     '<button class="button button-ghost" type="button" id="removeQuestionBtn">'+(question.isOriginal?'Restaurar original':'Excluir pergunta')+'</button>')+'</div></form>':
   '<div class="empty studio-empty">Nenhuma pergunta neste tópico. Clique em “Nova pergunta” ou mova uma pergunta existente para cá.</div>';
+ if(locked){
+  form=form.replace('<form id="studioQuestionForm" class="question-editor">','<div id="studioQuestionForm" class="question-editor studio-locked"><div class="notice">🔒 <strong>Pergunta fixa de Clima.</strong> Enunciado, alternativas, gabarito e tópico protegidos.</div>')
+   .replace(/<(textarea|input|select)\b/g,'<$1 disabled')
+   .replace(/<div class="editor-actions">[\s\S]*?<\/div><\/form>$/,'</div>');
+ }
  host.innerHTML='<section class="admin-panel studio-panel"><div class="panel-title"><div><h2>Banco de perguntas</h2><p class="muted">Você cria seus tópicos, escolhe a cor e organiza as perguntas como quiser.</p></div><span class="score-pill">'+bank.length+' QUESTÕES</span></div>'+
   '<form id="newTopicForm" class="topic-create"><label>Novo tópico<input required id="newTopicTitle" maxlength="70" placeholder="Ex.: Biomas"></label><label>Cor<input id="newTopicColor" type="color" value="#CB6E9B"></label><button class="button button-ghost" type="submit">+ Criar tópico</button></form>'+
   '<div class="topic-chips" aria-label="Tópicos">'+topicTabs+'</div>'+topicManage+
@@ -65,6 +73,7 @@ export function renderStudio(host,{bank,topics,onChanged}){
   };
  }
  if(!question)return;
+ if(locked)return;
  if(creating)document.getElementById('cancelNewQuestion').onclick=()=>{creating=false;renderStudio(host,{bank,topics,onChanged})};
  document.getElementById('editorImage').oninput=event=>{
   const src=safeImage(event.target.value.trim());

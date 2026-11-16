@@ -1,4 +1,5 @@
 import { CONFIG } from './config.js';
+import {isFixedClimateQuestion} from './questions.js';
 const root=CONFIG.SUPABASE_URL.replace(/\/$/,'');
 const key=CONFIG.SUPABASE_PUBLISHABLE_KEY;
 export const configured=Boolean(root&&key);
@@ -28,6 +29,7 @@ export function signOut(){session=null;localStorage.removeItem(AUTH_KEY)}
 export async function getRole(){const token=await getValidToken();if(!token)return null;const rows=await request(`/rest/v1/quiz_roles?select=role&user_id=eq.${encodeURIComponent(session.user.id)}&limit=1`,{token});return rows?.[0]?.role??null}
 export async function fetchOverrides(){return await request('/rest/v1/quiz_question_overrides?select=id,category,text,options,correct,fact,image,updated_at&order=id.asc')}
 export async function updateQuestion(question){
+ if(isFixedClimateQuestion(question))throw new Error('As dez questões de Clima não podem ser alteradas.');
  const token=await getValidToken();if(!token||await getRole()!=='admin')throw new Error('Somente a conta ADM pode editar.');
  const payload={id:question.id,category:question.category,text:question.text,options:question.options,correct:question.correct,fact:question.fact||'',image:question.image||null,updated_at:new Date().toISOString()};
  await request('/rest/v1/quiz_question_overrides?on_conflict=id',{method:'POST',token,prefer:'resolution=merge-duplicates,return=minimal',body:payload});return true;
@@ -79,6 +81,7 @@ export async function saveMusicSettings(videoId){
  return request('/rest/v1/quiz_music_settings?id=eq.true',{method:'PATCH',token,prefer:'return=minimal',body:{youtube_video_id:videoId,updated_at:new Date().toISOString()}});
 }
 export async function resetQuestion(id){
+ if(isFixedClimateQuestion(id))throw new Error('Questão fixa de Clima: restauração desativada.');
  const token=await getValidToken();
  if(!token||await getRole()!=='admin')throw new Error('Somente o ADM pode restaurar questões.');
  if(!/^[GCTVB]\d{2}$/.test(id))throw new Error('Código de questão inválido.');
@@ -97,10 +100,12 @@ export async function loadQuizData(defaultQuestions){
  ]);
  const edits=new Map(changes.map(x=>[x.id,x])),placed=new Map(assignments.map(x=>[x.question_id,x.topic_id]));
  const base=defaultQuestions.map(q=>{
+  // A base fixa sobrepõe qualquer edição ou mudança de tópico registrada no banco.
+  if(isFixedClimateQuestion(q))return {...q,options:[...q.options],topicId:null,active:true,isOriginal:true,fixed:true};
   const over=edits.get(q.id)||{};
   return {...q,...over,options:[...(over.options||q.options)],topicId:placed.get(q.id)||null,active:true,isOriginal:true};
  });
- const added=extras.map(q=>({id:q.id,text:q.text,options:q.options,correct:q.correct,fact:q.fact,image:q.image,topicId:q.topic_id||null,active:q.active,isOriginal:false}));
+ const added=extras.filter(q=>!isFixedClimateQuestion(q)).map(q=>({id:q.id,text:q.text,options:q.options,correct:q.correct,fact:q.fact,image:q.image,topicId:q.topic_id||null,active:q.active,isOriginal:false}));
  return {topics,bank:base.concat(added)};
 }
 async function requireAdminToken(){
@@ -126,6 +131,7 @@ export async function removeTopic(id){
  await request('/rest/v1/quiz_topics?id=eq.'+encodeURIComponent(id),{method:'DELETE',token,prefer:'return=minimal'});
 }
 export async function saveBankQuestion(question){
+ if(isFixedClimateQuestion(question))throw new Error('As dez questões de Clima são imutáveis.');
  const token=await requireAdminToken();
  if(question.isOriginal){
   await updateQuestion(question);
@@ -136,6 +142,7 @@ export async function saveBankQuestion(question){
  }
 }
 export async function removeBankQuestion(question){
+ if(isFixedClimateQuestion(question))throw new Error('As questões fixas de Clima não podem ser excluídas.');
  const token=await requireAdminToken();
  if(question.isOriginal)throw new Error('As perguntas originais só podem ser restauradas.');
  await request('/rest/v1/quiz_extra_questions?id=eq.'+encodeURIComponent(question.id),{method:'DELETE',token,prefer:'return=minimal'});
