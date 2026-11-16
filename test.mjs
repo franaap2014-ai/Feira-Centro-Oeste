@@ -75,3 +75,15 @@ assert.ok(adminJS.includes('requestPasswordReset(email)'));
 assert.ok(backendJS.includes("'/auth/v1/recover?redirect_to='"));
 assert.ok(!adminHTML.includes('tkDJY%q!vNky4ZKtVZ8FzY'),'Não publicar senhas conhecidas');
 console.log('✓ Recuperação do acesso ADM configurada sem publicar segredos.');
+
+
+// ADM: e-mail primeiro e criação da senha via link seguro.
+const firstAccessHtml=readFileSync('index.html','utf8');
+const firstAccessJs=readFileSync('app.js','utf8');
+assert.ok(firstAccessHtml.includes('id="adminPasswordFields" hidden'));
+assert.ok(firstAccessHtml.includes('id="toggleAdminLogin"'));
+assert.ok(firstAccessHtml.includes('Criar minha senha'));
+assert.ok(firstAccessJs.includes("adminLoginMode==='setup'"));
+assert.ok(firstAccessJs.includes("await requestPasswordReset(email)"));
+assert.ok(firstAccessJs.includes("showLogin('login')"));
+console.log('✓ Acesso ADM por e-mail, criação de senha e login separados.');

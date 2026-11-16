@@ -56,33 +56,64 @@ function result(){
  const attempt={score,questionIds:state.questions.map(q=>q.id),answers:state.answers.map(a=>({question_id:a.question_id,answer_id:a.answer_id,correct:a.correct})),questionSnapshot,mode:state.mode,participantId:state.mode==='fair'?getVisitor()?.id||null:null,guestToken:state.role==='admin'?null:getVisitor()?.token||null};
  if(configured)saveAttempt(attempt).then(r=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent=r.saved?'✓ Participação registrada com sucesso.':'Pontuação não salva.'}).catch(()=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent='Não foi possível salvar online. O resultado permanece válido.'});
 }
-function showLogin(){
- if(!configured){loginDialog.showModal();document.getElementById('loginStatus').textContent='O login será habilitado quando o Supabase estiver conectado. Consulte o arquivo README.md.';return}
- document.getElementById('loginStatus').textContent='';loginDialog.showModal();document.getElementById('loginEmail').focus();
+let adminLoginMode='setup';
+function setAdminLoginMode(mode){
+ adminLoginMode=mode==='login'?'login':'setup';
+ const entering=adminLoginMode==='login';
+ document.getElementById('loginTitle').innerHTML=entering?'Entrar como ADM <span>✦</span>':'Criar senha de ADM <span>✦</span>';
+ document.getElementById('loginIntro').textContent=entering?
+  'Entre com o e-mail autorizado e a senha que você criou.':
+  'Digite o e-mail autorizado. Enviaremos um link seguro para você criar sua própria senha.';
+ document.getElementById('adminPasswordFields').hidden=!entering;
+ const pw=document.getElementById('loginPassword');pw.required=entering;
+ if(!entering)pw.value='';
+ document.getElementById('loginSubmit').innerHTML=entering?'Entrar na minha conta <span aria-hidden="true">↗</span>':'Criar minha senha <span aria-hidden="true">↗</span>';
+ document.getElementById('toggleAdminLogin').textContent=entering?'Criar minha senha':'Já tenho senha — Entrar';
+ document.getElementById('recoverAdminPassword').hidden=!entering;
+ document.getElementById('loginStatus').textContent='';
 }
+function showLogin(mode='setup'){
+ if(!configured){loginDialog.showModal();document.getElementById('loginStatus').textContent='O banco de autenticação está indisponível. Tente novamente mais tarde.';return}
+ setAdminLoginMode(mode);
+ if(!loginDialog.open)loginDialog.showModal();
+ document.getElementById('loginEmail').focus();
+}
+document.getElementById('toggleAdminLogin').onclick=()=>setAdminLoginMode(adminLoginMode==='login'?'setup':'login');
 loginForm.addEventListener('submit',async e=>{
- e.preventDefault();const submit=document.getElementById('loginSubmit'),st=document.getElementById('loginStatus');
- submit.disabled=true;st.textContent='Verificando conta...';
- try{const role=await signIn(document.getElementById('loginEmail').value.trim(),document.getElementById('loginPassword').value);if(role!=='admin'&&role!=='operator'){signOut();throw new Error('Esta conta ainda não foi autorizada pelo organizador.');}
- state.role=role;state.mode=role==='admin'?'test':'fair';state.email=document.getElementById('loginEmail').value.trim();loginDialog.close();loginForm.reset();setNav();role==='admin'?showAdmin():showOperator();
- }catch(err){const msg=String(err?.message||'');st.textContent=/invalid login credentials|invalid credentials/i.test(msg)?'E-mail ou senha incorretos. Se não souber a senha, use “Esqueci a senha”.':msg||'Não foi possível entrar.'}finally{submit.disabled=false}
+ e.preventDefault();
+ const submit=document.getElementById('loginSubmit'),st=document.getElementById('loginStatus');
+ const email=document.getElementById('loginEmail').value.trim();
+ submit.disabled=true;
+ try{
+  if(adminLoginMode==='setup'){
+   st.textContent='Enviando link seguro para criar sua senha…';
+   await requestPasswordReset(email);
+   st.textContent='Se o e-mail for o da conta ADM autorizada, você receberá um link para criar uma senha. Abra o e-mail, escolha a senha e depois volte para entrar.';
+   return;
+  }
+  st.textContent='Verificando conta…';
+  const role=await signIn(email,document.getElementById('loginPassword').value);
+  if(role!=='admin'&&role!=='operator'){
+   signOut();
+   throw new Error('Esta conta não possui acesso administrativo.');
+  }
+  state.role=role;
+  state.mode=role==='admin'?'test':'fair';
+  state.email=email;
+  loginDialog.close();
+  loginForm.reset();
+  setNav();
+  role==='admin'?showAdmin():showOperator();
+ }catch(err){
+  const msg=String(err?.message||'');
+  st.textContent=/invalid login credentials|invalid credentials/i.test(msg)?
+   'Senha incorreta. Toque em “Esqueci a senha” para criar outra.':
+   msg||'Não foi possível concluir.';
+ }finally{submit.disabled=false}
 });
-
 function setupAdminPasswordRecovery(){
  const link=document.getElementById('recoverAdminPassword');
- if(link)link.addEventListener('click',async()=>{
-  const email=document.getElementById('loginEmail').value.trim();
-  const status=document.getElementById('loginStatus');
-  if(!email||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
-   status.textContent='Digite primeiro seu e-mail ADM para receber a recuperação.';document.getElementById('loginEmail').focus();return;
-  }
-  link.disabled=true;status.textContent='Solicitando link de recuperação…';
-  try{
-   await requestPasswordReset(email);
-   status.textContent='Se o e-mail estiver cadastrado, você receberá um link para definir uma nova senha. Confira sua caixa de entrada.';
-  }catch(error){status.textContent='Não foi possível enviar o link: '+(error?.message||'Tente novamente.')}
-  finally{link.disabled=false}
- });
+ if(link)link.addEventListener('click',()=>setAdminLoginMode('setup'));
  const hash=new URLSearchParams(location.hash.replace(/^#/,''));
  if(hash.has('error')||hash.has('error_code')){
   history.replaceState(null,'',location.pathname+location.search);
@@ -129,8 +160,8 @@ function setupAdminPasswordRecovery(){
    dialog.querySelector('#repeatRecoveryPassword').value='';
    signOut();
    close();
-   showLogin();
-   document.getElementById('loginStatus').textContent='✓ Senha redefinida. Entre com o e-mail ADM e sua nova senha.';
+   showLogin('login');
+   document.getElementById('loginStatus').textContent='✓ Senha criada. Entre com o e-mail ADM e sua nova senha.';
   }catch(error){status.textContent='Não foi possível alterar: '+(error?.message||'O link pode ter expirado.');}
   finally{btn.disabled=false}
  };

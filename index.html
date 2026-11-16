@@ -38,13 +38,16 @@
   <form id="loginForm" class="login-content">
     <button id="closeLogin" class="modal-close" type="button" aria-label="Fechar">×</button>
     <span class="eyebrow">ACESSO DE ADM</span>
-    <h2 id="loginTitle">Entrar como ADM <span>✦</span></h2>
-    <p>Área exclusiva da administração. Entre com o e-mail autorizado e sua senha.</p>
-    <label for="loginEmail">E-mail</label><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="seu@email.com" />
-    <label for="loginPassword">Senha</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Sua senha" />
+    <h2 id="loginTitle">Criar senha de ADM <span>✦</span></h2>
+    <p id="loginIntro">Digite o e-mail autorizado. Você receberá um link seguro para escolher sua senha, sem precisar de uma senha pré-definida.</p>
+    <label for="loginEmail">E-mail</label><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="seu@email.com" value="Franaap2014@gmail.com" />
+    <div id="adminPasswordFields" hidden>
+      <label for="loginPassword">Senha</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" />
+    </div>
     <p class="form-status" id="loginStatus" role="status"></p>
-    <button id="loginSubmit" class="button button-primary full" type="submit">Entrar na minha conta <span aria-hidden="true">↗</span></button>
-    <button id="recoverAdminPassword" type="button" class="admin-forgot">Esqueci a senha</button>
+    <button id="loginSubmit" class="button button-primary full" type="submit">Criar minha senha <span aria-hidden="true">↗</span></button>
+    <button id="toggleAdminLogin" type="button" class="admin-forgot">Já tenho senha — Entrar</button>
+    <button id="recoverAdminPassword" type="button" class="admin-forgot" hidden>Esqueci a senha</button>
     <small>As contas comuns usam username e senha, sem acesso às funções do ADM.</small>
   </form>
 </dialog>
