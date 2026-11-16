@@ -135,7 +135,7 @@ document.getElementById('verifyAdminGoogle').onclick=async()=>{
  const button=document.getElementById('verifyAdminGoogle');
  const status=document.getElementById('googleVerifyStatus');
  button.disabled=true;status.textContent='Abrindo a verificação segura do Google…';
- try{await startGoogleVerification()}
+ try{await startGoogleVerification();button.disabled=false;await refreshGoogle()}
  catch(error){status.textContent=String(error.message||'Não foi possível abrir o Google.');button.disabled=false}
 };
 loginForm.addEventListener('submit',async event=>{
