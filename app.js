@@ -20,10 +20,65 @@ function setNav(){
 const permittedImages=['assets/cerrado.svg','assets/pantanal.svg','assets/pequi.svg','assets/pantaneiro.svg','assets/congresso.svg','assets/cavalhadas.svg'];
 const imageHTML=(q)=>(permittedImages.includes(q.image)||(()=>{try{return new URL(q.image).protocol==='https:'}catch{return false}})())?`<figure class="question-image"><img src="${escapeHTML(q.image)}" alt="Ilustração para a pergunta: ${escapeHTML(q.text)}" loading="eager"><figcaption>Ilustração didática • Centro-Oeste</figcaption></figure>`:'';
 function svgArt(){return document.getElementById('illustration').innerHTML}
-function home(){state.page='home';setNav();root.innerHTML=`<section class="home-layout" id="inicio"><div class="home-copy"><span class="top-chip">✦ &nbsp; FEIRA CULTURAL CSA 2026 <i>•</i> 7º B</span><h1>Descubra o <span class="highlight">Centro-<span class="serif">Oeste.</span></span></h1><p class="home-description">Teste seus conhecimentos sobre o <strong>Centro-Oeste</strong> em uma viagem rápida por sabores, histórias, lugares e tradições da nossa região!</p><div class="home-themes" aria-label="Temas do quiz">${categories.map(c=>'<span class="home-theme">'+escapeHTML(c.icon)+' '+escapeHTML(c.label)+'</span>').join('')}</div><div class="hero-actions"><button id="startBtn" class="button button-primary" type="button">Jogar agora <span aria-hidden="true">↗</span></button><span class="play-note">✦ 30 no banco · 5 por partida<br>Rápido, divertido e gratuito</span></div><div class="home-bottom"><span>7º B — CSA</span><span class="separator"></span><span>Centro-Oeste</span><span class="separator"></span><span>2026</span></div></div><div class="home-art"><div class="art-panel"><span class="art-doodle doodle-a" aria-hidden="true">✳</span><span class="art-doodle doodle-b" aria-hidden="true">✦</span>${svgArt()}<div class="floating-stamp"><strong>5 desafios</strong><span>uma viagem de descobertas ✦</span></div></div></div></section>`;
+function home(){
+ state.page='home';setNav();
+ const cards=categories.map((cat,i)=>`<article class="v2-topic-card" style="--card-index:${i}" aria-label="Tema ${escapeHTML(cat.label)}">
+  <span class="v2-topic-icon" aria-hidden="true">${escapeHTML(cat.icon)}</span>
+  <div class="v2-topic-info"><h3>${escapeHTML(cat.label)}</h3><p>${escapeHTML(cat.subtitle)}</p></div>
+  <span class="v2-topic-arrow" aria-hidden="true">✦</span>
+ </article>`).join('');
+ root.innerHTML=`
+ <section class="v2-hero" id="inicio" aria-labelledby="v2-title">
+  <div class="v2-star v2-star-a" aria-hidden="true">✦</div>
+  <div class="v2-star v2-star-b" aria-hidden="true">✳</div>
+  <div class="v2-hero-grid">
+   <div class="v2-hero-copy">
+    <div class="v2-kicker"><span class="v2-kicker-star">✦</span> FEIRA CULTURAL <span class="v2-kicker-sep"></span> 7º ANO B</div>
+    <h1 id="v2-title">Uma aventura pelo <span>Centro-Oeste<span class="v2-punctuation">.</span></span></h1>
+    <p class="v2-hero-subtitle">Embarque em um quiz cheio de descobertas! Explore as paisagens do <strong>Pantanal</strong>, conheça sabores, tradições e tudo o que faz nossa região especial.</p>
+    <div class="v2-hero-actions">
+     <button id="startBtn" type="button" class="v2-start-button">Começar o desafio <span aria-hidden="true">↗</span></button>
+     <a href="#como-jogar" class="v2-how-button">Como jogar <span aria-hidden="true">↓</span></a>
+    </div>
+    <div class="v2-fast-facts" aria-label="Detalhes do quiz"><span><strong>30</strong> perguntas no banco</span><i aria-hidden="true"></i><span><strong>5</strong> por partida</span><i aria-hidden="true"></i><span><strong>5</strong> temas</span></div>
+    <p class="v2-access-note">✦ 30 no banco · 5 por partida <span>•</span> Divirta-se aprendendo!</p>
+   </div>
+   <div class="v2-hero-visual" aria-label="Paisagem ilustrada do Pantanal">
+    <div class="v2-visual-orbit v2-orbit-one"></div>
+    <div class="v2-visual-orbit v2-orbit-two"></div>
+    <div class="v2-visual-illustration">${svgArt()}</div>
+    <div class="v2-float-tag v2-tag-top"><span aria-hidden="true">🌷</span><span><small>CONHEÇA O</small><strong>Pantanal</strong></span></div>
+    <div class="v2-float-tag v2-tag-bottom"><span class="v2-sparkle" aria-hidden="true">✦</span><span><strong>Explore!</strong><small>Descubra & aprenda</small></span></div>
+    <span class="v2-deco-flower v2-flower-a" aria-hidden="true">✿</span>
+    <span class="v2-deco-flower v2-flower-b" aria-hidden="true">✳</span>
+   </div>
+  </div>
+  <div class="v2-hero-foot"><span>✳ CRIADO PELO 7º B — CSA</span><span>UMA VIAGEM PELA NOSSA REGIÃO <b aria-hidden="true">↗</b></span></div>
+ </section>
+ <section class="v2-discover" id="temas" aria-labelledby="v2-topics-heading">
+  <div class="v2-section-top"><span class="v2-section-eyebrow">✦ NOSSO ROTEIRO</span><span class="v2-section-overline">05 EXPERIÊNCIAS INCRÍVEIS</span></div>
+  <div class="v2-section-title-row"><h2 id="v2-topics-heading">O que vamos <em>descobrir?</em></h2><p>Cada partida reúne uma pergunta de cada tema. Você aprende enquanto se diverte!</p></div>
+  <div class="v2-topic-grid">${cards}</div>
+ </section>
+ <section class="v2-how" id="como-jogar" aria-labelledby="v2-how-title">
+  <div class="v2-how-intro"><span class="v2-section-eyebrow">✦ SIMPLES E DIVERTIDO</span><h2 id="v2-how-title">Como <em>jogar?</em></h2><p>São só três passos para embarcar nessa aventura.</p><button type="button" id="startBottomBtn" class="v2-bottom-start">Quero começar <span aria-hidden="true">↗</span></button></div>
+  <div class="v2-how-steps">
+   <div class="v2-step"><span class="v2-step-num">01</span><div><strong>Entre no jogo</strong><p>Crie sua conta ou entre com seu nome de usuário.</p></div></div>
+   <div class="v2-step"><span class="v2-step-num">02</span><div><strong>Responda às perguntas</strong><p>São 5 questões, uma de cada tema do Centro-Oeste.</p></div></div>
+   <div class="v2-step"><span class="v2-step-num">03</span><div><strong>Veja seu resultado</strong><p>Confira seus acertos e conheça novas curiosidades!</p></div></div>
+  </div>
+ </section>`;
  document.getElementById('startBtn').onclick=start;
- const visitor=getVisitor();if(visitor&&state.role!=='admin'){const button=document.createElement('button');button.type='button';button.className='button button-ghost';button.textContent='Trocar participante ('+visitor.username+')';button.onclick=()=>{clearVisitor();home()};document.querySelector('.hero-actions')?.appendChild(button)}
+ document.getElementById('startBottomBtn').onclick=start;
+ const visitor=getVisitor();
+ if(visitor&&state.role!=='admin'){
+  const button=document.createElement('button');button.type='button';button.className='v2-switch-guest';button.textContent='Trocar participante: '+visitor.username;
+  button.onclick=()=>{clearVisitor();home()};
+  document.querySelector('.v2-hero-actions')?.appendChild(button);
+ }
 }
+document.querySelector('.brand')?.addEventListener('click',e=>{e.preventDefault();home();window.scrollTo({top:0,behavior:'smooth'})});
+
 async function start(){
  if(state.role!=='admin'&&!getVisitor()){openGuestAccess(()=>start());return}
  state.page='loading';root.innerHTML='<p class="notice">Preparando as cinco perguntas…</p>';

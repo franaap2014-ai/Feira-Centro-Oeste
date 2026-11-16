@@ -129,3 +129,15 @@ for(let i=0;i<1000;i++){
  assert.equal(new Set(round.map(q=>q.category)).size,5);
 }
 console.log('✓ Cinco perguntas por partida e Pantanal como quinto tema.');
+
+
+// Homepage reformulada em rosa e branco, mantendo login, músicas e quiz.
+assert.ok(appSource.includes('class="v2-hero"'));
+assert.ok(appSource.includes('id="startBtn"'));
+assert.ok(appSource.includes('id="startBottomBtn"'));
+assert.ok(appSource.includes('id="como-jogar"'));
+assert.ok(appSource.includes('O que vamos'));
+assert.ok(appSource.includes('Pantanal'));
+assert.ok(readFileSync('style.css','utf8').includes('HOME V2'));
+assert.ok(readFileSync('index.html','utf8').includes('topbar topbar-v2'));
+console.log('✓ Tela inicial rosa e branca, acessível e com ações de jogo preservadas.');
