@@ -122,7 +122,7 @@ assert.equal(questions.filter(q=>q.category==='pantanal').length,4);
 assert.equal(questions.filter(q=>q.category==='brasilia').length,0);
 assert.ok(readFileSync('index.html','utf8').includes('Paisagem do Pantanal com tuiuiú'));
 assert.ok(!readFileSync('index.html','utf8').includes('Congresso Nacional de Brasília e paisagem'));
-assert.ok(appSource.includes('40 no banco · 5 por partida'));
+assert.ok(appSource.includes('categories.length'));
 for(let i=0;i<1000;i++){
  const round=makeFlexibleSession(questions);
  assert.equal(round.length,5);
@@ -132,13 +132,13 @@ console.log('✓ Cinco perguntas por partida e sete temas, incluindo Clima e Bio
 
 
 // Homepage reformulada em rosa e branco, mantendo login, músicas e quiz.
-assert.ok(appSource.includes('class="v3-hero"'));
+assert.ok(appSource.includes('class="atlas-hero"'));
 assert.ok(appSource.includes('id="startBtn"'));
 assert.ok(appSource.includes('id="startBottomBtn"'));
 assert.ok(appSource.includes('id="como-jogar"'));
-assert.ok(appSource.includes('O que vamos'));
+assert.ok(appSource.includes('Sete temas'));
 assert.ok(appSource.includes('Pantanal'));
-assert.ok(readFileSync('style.css','utf8').includes('HOME V3'));
+assert.ok(readFileSync('style.css','utf8').includes('HOME V5'));
 assert.ok(readFileSync('index.html','utf8').includes('topbar topbar-v3'));
 console.log('✓ Novo hero fotográfico do Pantanal, design responsivo e ações de jogo preservadas.');
 
@@ -167,9 +167,9 @@ console.log('✓ Sessões permanecem salvas no aparelho e não são apagadas por
 // Centro-Oeste completo, destaques locais e sessão mantida na primeira tela.
 for(const place of ['Goiás','Mato Grosso','Mato Grosso do Sul','Distrito Federal'])assert.ok(appSource.includes(place),'Faltou '+place);
 for(const art of ['assets/cerrado.svg','assets/pantanal.svg','assets/cavalhadas.svg','assets/pequi.svg'])assert.ok(appSource.includes(art),'Faltou imagem '+art);
-assert.ok(appSource.includes('v4-session-pill')&&appSource.includes('v4SignOut'));
-assert.ok(appSource.includes("visitor?'Continuar jogando':'Começar o quiz'"));
-assert.ok(appSource.includes('REGIÃO CENTRO-OESTE'));
+assert.ok(appSource.includes('atlas-session')&&appSource.includes('atlasSignOut'));
+assert.ok(appSource.includes("visitor?'Continuar jogando':'Começar o desafio'"));
+assert.ok(appSource.includes('Centro-Oeste'));
 console.log('✓ Paisagens e cultura do Centro-Oeste + botão continuar conectado e sair.');
 
 for(const [idx,[text,options,correct]] of [["Qual é a vegetação predominante na Região Centro-Oeste?",["Caatinga","Cerrado","Mata Atlântica","Pampas"],1],["Qual é uma característica do Cerrado?",["Árvores baixas e troncos retorcidos","Muitas árvores cobertas de neve","Vegetação totalmente rasteira","Florestas muito fechadas e úmidas"],0],["Qual bioma também está presente no Centro-Oeste?",["Pampa","Pantanal","Mata de Araucárias","Manguezal"],1],["Como é a vegetação do Pantanal?",["Apenas cactos","Somente árvores altas","Mistura de campos, árvores e plantas aquáticas","Apenas gramíneas secas"],2],["Qual fator influencia a vegetação do Cerrado?",["Neve constante","Clima tropical, com períodos secos e chuvosos","Frio intenso durante todo o ano","Clima polar"],1],["Qual planta é comum no Cerrado?",["Pequi","Pinheiro","Maçã","Oliveira"],0],["O que acontece com muitas plantas do Cerrado durante a seca?",["Crescem debaixo da água","Adaptam-se à falta de água","Ficam cobertas de neve","Desaparecem completamente"],1],["Qual é uma ameaça à vegetação do Centro-Oeste?",["Desmatamento","Nevascas","Terremotos","Geleiras"],0],["Qual estado brasileiro possui grande parte do Pantanal?",["São Paulo","Mato Grosso do Sul","Paraná","Rio de Janeiro"],1],["Por que a vegetação do Centro-Oeste é importante?",["Porque não possui animais","Porque serve apenas para decoração","Porque abriga animais e mantém o equilíbrio ambiental","Porque impede todas as chuvas"],2]].entries()){
@@ -185,3 +185,11 @@ for(let i=0;i<1200;i++){
  assert.equal(new Set(round.map(q=>q.category)).size,5);
 }
 console.log('✓ As 10 novas questões de Biomas e Vegetação, os 10 gabaritos e a seleção de 5 perguntas foram conferidos.');
+
+assert.ok(appSource.includes('class="atlas-home"'));
+assert.ok(appSource.includes('id="atlas-title"'));
+assert.ok(appSource.includes('id="atlasSignOut"'));
+assert.ok(appSource.includes('id="startBtn"')&&appSource.includes('id="startBottomBtn"'));
+assert.ok(appSource.includes('id="como-jogar"'));
+assert.ok(readFileSync('index.html','utf8').includes('40 perguntas e 7 temas'));
+console.log('✓ Nova tela inicial Atlas do Centro-Oeste, sete temas, login e ações preservadas.');

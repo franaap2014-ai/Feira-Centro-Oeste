@@ -25,71 +25,66 @@ function svgArt(){return document.getElementById('illustration').innerHTML}
 function home(){
  state.page='home';setNav();
  const visitor=getVisitor();
- const regionalScenes=[
-  {name:'Cerrado',kind:'NOSSO BIOMA',image:'assets/cerrado.svg',description:'Árvores retorcidas, raízes profundas e uma natureza cheia de vida.',tone:'cerrado'},
-  {name:'Pantanal',kind:'ÁGUAS E FAUNA',image:'assets/pantanal.svg',description:'Planícies alagadas, tuiuiús, capivaras e muita biodiversidade.',tone:'pantanal'},
-  {name:'Tradições',kind:'CULTURA',image:'assets/cavalhadas.svg',description:'Catira, siriri, cururu e as Cavalhadas de Pirenópolis.',tone:'tradicoes'},
-  {name:'Sabores regionais',kind:'GASTRONOMIA',image:'assets/pequi.svg',description:'Pequi, empadão goiano, chipa e tereré.',tone:'sabores'}
+ const region=[
+  {id:'cerrado',name:'O Cerrado',subtitle:'BIOMA',description:'Árvores de troncos retorcidos, raízes profundas e paisagens de resistência.',image:'assets/cerrado.svg'},
+  {id:'pantanal',name:'O Pantanal',subtitle:'NATUREZA',description:'Planícies alagadas e vida selvagem nas margens dos rios.',image:'assets/pantanal.svg'},
+  {id:'festas',name:'Nossa cultura',subtitle:'TRADIÇÃO',description:'Cavalhadas, catira, siriri e cururu: ritmos e histórias da região.',image:'assets/cavalhadas.svg'},
+  {id:'sabores',name:'Nossos sabores',subtitle:'CULINÁRIA',description:'Pequi, empadão goiano, chipa e tereré fazem parte dessa viagem.',image:'assets/pequi.svg'}
  ];
- const sceneCards=regionalScenes.map(s=>`<article class="v4-scene v4-scene-${s.tone}"><img src="${s.image}" alt="Ilustração sobre ${escapeHTML(s.name)}" loading="lazy" width="220" height="150"><div class="v4-scene-body"><span>${escapeHTML(s.kind)}</span><h3>${escapeHTML(s.name)}</h3><p>${escapeHTML(s.description)}</p></div></article>`).join('');
- const topicCards=categories.map((cat,i)=>`<article class="v3-topic-card">
-  <span class="v3-topic-icon" aria-hidden="true">${escapeHTML(cat.icon)}</span>
-  <span class="v3-topic-number">0${i+1}</span>
-  <h3>${escapeHTML(cat.label)}</h3>
-  <p>${escapeHTML(cat.subtitle)}</p>
-  ${cat.id==='clima'?'<span class="v3-fixed-label">10 perguntas fixas</span>':''}
- </article>`).join('');
+ const regionCards=region.map((r,i)=>`<article class="atlas-scene atlas-scene-${r.id}"><img src="${r.image}" alt="Ilustração de ${escapeHTML(r.name)}" loading="lazy" width="230" height="154"><div><small>${String(i+1).padStart(2,'0')} / ${r.subtitle}</small><h3>${escapeHTML(r.name)}</h3><p>${escapeHTML(r.description)}</p></div></article>`).join('');
+ const themeCards=categories.map((c,i)=>{
+  const count=questions.filter(q=>q.category===c.id).length;
+  return `<article class="atlas-topic"><div class="atlas-topic-top"><span class="atlas-topic-icon">${escapeHTML(c.icon)}</span><span class="atlas-topic-num">${String(i+1).padStart(2,'0')}</span></div><h3>${escapeHTML(c.label)}</h3><p>${escapeHTML(c.subtitle)}</p><span class="atlas-topic-count">${count} perguntas ${c.id==='clima'?'· protegidas 🔒':''}</span></article>`;
+ }).join('');
  root.innerHTML=`
-  <div class="v3-landing" id="inicio">
-   <section class="v3-hero" aria-labelledby="v3-hero-title">
-    <div class="v3-hero-inner">
-     <span class="v3-eyebrow"><span class="v3-dot" aria-hidden="true"></span> FEIRA CULTURAL CSA 2026 <span class="v3-small-sep">/</span> 7º ANO B</span>
-     <h1 id="v3-hero-title">Descubra o <span>Centro-Oeste.</span></h1>
-     <p class="v3-hero-lead">Natureza, cultura e tradição no coração do Brasil.</p>
-     <p class="v3-hero-description">De Goiás ao Pantanal, de Brasília ao Cerrado: explore Mato Grosso, Mato Grosso do Sul, a culinária e as festas que fazem nossa região única.</p>
-     <div class="v3-hero-buttons">
-      <button type="button" id="startBtn" class="v3-primary">${visitor?'Continuar jogando':'Começar o quiz'} <span aria-hidden="true">↗</span></button>
-      <a href="#como-jogar" class="v3-outline">Como jogar <span aria-hidden="true">↓</span></a>
-     </div>
-     ${visitor&&state.role!=='admin'?'<div class="v4-session-pill"><span class="v4-session-dot"></span><span>Conectado como <strong>'+escapeHTML(visitor.username)+'</strong></span><button type="button" id="v4SignOut">Sair</button></div>':'<p class="v4-session-note">Entre uma vez e continue conectado nas próximas visitas neste aparelho.</p>'}
+ <div class="atlas-home" id="inicio">
+  <section class="atlas-hero" aria-labelledby="atlas-title">
+   <div class="atlas-hero-intro">
+    <div class="atlas-banner"><span class="atlas-sunburst">✺</span> FEIRA CULTURAL CSA 2026 <span class="atlas-separator">/</span> 7º B</div>
+    <p class="atlas-eyebrow">UMA JORNADA PELO CORAÇÃO DO BRASIL</p>
+    <h1 id="atlas-title">Centro-Oeste: <em>terra de muitas histórias.</em></h1>
+    <p class="atlas-hero-text">Explore o Cerrado, o Pantanal, os sabores e as tradições de Goiás, Mato Grosso, Mato Grosso do Sul e do Distrito Federal.</p>
+    <div class="atlas-hero-actions">
+     <button id="startBtn" class="atlas-cta" type="button">${visitor?'Continuar jogando':'Começar o desafio'} <span aria-hidden="true">↗</span></button>
+     <a class="atlas-secondary" href="#como-jogar">Como jogar <span aria-hidden="true">↓</span></a>
     </div>
-    <div class="v3-photo-location"><span class="v3-location-icon" aria-hidden="true">⌖</span><span>REGIÃO CENTRO-OESTE <small>GO · MT · MS · DF · BRASIL</small></span></div>
-   </section>
-   <div class="v3-stat-strip" aria-label="Informações do desafio">
-    <div class="v3-stat"><strong>30</strong><span>perguntas no banco</span></div>
-    <div class="v3-stat"><strong>05</strong><span>por partida</span></div>
-    <div class="v3-stat"><strong>06</strong><span>temas para explorar</span></div>
-    <div class="v3-stat"><strong>10</strong><span>questões fixas de Clima</span></div>
+    ${visitor&&state.role!=='admin'?'<div class="atlas-session"><span class="atlas-online-dot"></span> Conectado como <strong>'+escapeHTML(visitor.username)+'</strong><button type="button" id="atlasSignOut">Sair</button></div>':'<p class="atlas-persistent-note">✦ Entre uma vez. Sua conta fica conectada neste aparelho.</p>'}
+    <div class="atlas-states" aria-label="Unidades federativas do Centro-Oeste"><small>ONDE A AVENTURA ACONTECE</small><span><b>GO</b> Goiás</span><span><b>MT</b> Mato Grosso</span><span><b>MS</b> Mato Grosso do Sul</span><span><b>DF</b> Distrito Federal</span></div>
    </div>
-   <p class="v3-photo-caption">Pantanal, uma paisagem da região Centro-Oeste. Foto: <a href="https://commons.wikimedia.org/wiki/File:Pantanal,_Mato_Grosso,_Brasil.jpg" target="_blank" rel="noopener noreferrer">Filipefrazao / Wikimedia Commons, CC BY-SA 3.0</a>.</p>
-   <section class="v4-region" aria-labelledby="v4-region-title">
-    <div class="v4-region-heading"><div><span class="v3-section-kicker">CONHEÇA NOSSA REGIÃO</span><h2 id="v4-region-title">O Centro-Oeste é <em>muito mais.</em></h2></div><p>Do Cerrado ao Pantanal, das Cavalhadas aos sabores de Goiás: uma viagem pelas paisagens e tradições regionais.</p></div>
-    <div class="v4-scenes">${sceneCards}</div>
-    <div class="v4-states" aria-label="Estados e Distrito Federal do Centro-Oeste">
-     <span>NOSSO MAPA</span>
-     <strong><b>GO</b> Goiás</strong><strong><b>MT</b> Mato Grosso</strong><strong><b>MS</b> Mato Grosso do Sul</strong><strong><b>DF</b> Distrito Federal</strong>
-    </div>
-   </section>
-   <section class="v3-section v3-topics" id="temas" aria-labelledby="v3-topics-title">
-    <div class="v3-section-heading">
-     <div><span class="v3-section-kicker">01 / CONHEÇA NOSSO QUIZ</span><h2 id="v3-topics-title">O que vamos <em>descobrir?</em></h2></div>
-     <p>Do clima à cultura, um pouco de tudo o que torna a nossa região tão especial.</p>
-    </div>
-    <div class="v3-topics-grid">${topicCards}</div>
-   </section>
-   <section class="v3-how-section" id="como-jogar" aria-labelledby="v3-how-title">
-    <div class="v3-how-heading"><span class="v3-section-kicker">02 / SUA VEZ DE EXPLORAR</span><h2 id="v3-how-title">Aprender pode ser <em>uma aventura.</em></h2><p>Um desafio rápido para testar seus conhecimentos. Sem complicação.</p><button id="startBottomBtn" type="button" class="v3-primary v3-bottom-btn">Vamos jogar <span aria-hidden="true">↗</span></button></div>
-    <div class="v3-steps">
-     <div><span>01</span><div><strong>Entre uma vez</strong><p>Sua conta continua conectada neste aparelho para as próximas partidas.</p></div></div>
-     <div><span>02</span><div><strong>Responda 5 perguntas</strong><p>Uma de Clima e outras quatro de temas variados.</p></div></div>
-     <div><span>03</span><div><strong>Veja como se saiu</strong><p>Confira sua pontuação e descubra curiosidades.</p></div></div>
-    </div>
-   </section>
-   <p class="v3-bottom-note">✦ 30 no banco · 5 por partida · Feira Cultural CSA 2026 · 7º B</p>
-  </div>`;
+   <div class="atlas-hero-photo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Pantanal%2C_Mato_Grosso%2C_Brasil.jpg/1280px-Pantanal%2C_Mato_Grosso%2C_Brasil.jpg" alt="Vista aérea da natureza, das águas e das lagoas do Pantanal brasileiro" loading="eager" fetchpriority="high" />
+    <div class="atlas-photo-tag"><span aria-hidden="true">⌖</span><div><strong>PANTANAL</strong><small>Região Centro-Oeste · Brasil</small></div></div>
+    <div class="atlas-stamp" aria-hidden="true">CSA<br><strong>26</strong></div>
+   </div>
+  </section>
+  <p class="atlas-photo-credit">Foto: <a href="https://commons.wikimedia.org/wiki/File:Pantanal,_Mato_Grosso,_Brasil.jpg" target="_blank" rel="noopener noreferrer">Filipefrazao / Wikimedia Commons, CC BY-SA 3.0</a>.</p>
+  <section class="atlas-metrics" aria-label="Informações do jogo">
+   <div><b>${questions.length}</b><span>perguntas no banco</span></div>
+   <div><b>05</b><span>por partida</span></div>
+   <div><b>${categories.length.toString().padStart(2,'0')}</b><span>temas para conhecer</span></div>
+   <div><b>20</b><span>de Clima e Biomas</span></div>
+  </section>
+  <section class="atlas-explore" aria-labelledby="atlas-explore-title">
+   <div class="atlas-section-head"><div><span>01 · DESCUBRA A REGIÃO</span><h2 id="atlas-explore-title">Entre rios, <em>sabores e tradições.</em></h2></div><p>A cultura do Centro-Oeste nasce de sua natureza, de seus povos e de suas paisagens.</p></div>
+   <div class="atlas-scenes">${regionCards}</div>
+  </section>
+  <section class="atlas-themes" id="temas" aria-labelledby="atlas-themes-title">
+   <div class="atlas-section-head"><div><span>02 · O CONHECIMENTO É A VIAGEM</span><h2 id="atlas-themes-title">Sete temas, <em>mil descobertas.</em></h2></div><p>Em cada partida, cinco perguntas diferentes — incluindo Clima e Biomas e Vegetação.</p></div>
+   <div class="atlas-topic-grid">${themeCards}</div>
+  </section>
+  <section class="atlas-how" id="como-jogar" aria-labelledby="atlas-how-title">
+   <div class="atlas-how-main"><span>03 · SUA VEZ DE PARTICIPAR</span><h2 id="atlas-how-title">Preparado para <em>essa viagem?</em></h2><p>Descubra o Centro-Oeste em um quiz com cinco perguntas por partida.</p><button class="atlas-cta" id="startBottomBtn" type="button">Quero jogar <span aria-hidden="true">↗</span></button></div>
+   <div class="atlas-how-steps">
+    <div><b>01</b><span><strong>Entre uma vez</strong><small>O site mantém sua conta conectada neste aparelho.</small></span></div>
+    <div><b>02</b><span><strong>Responda cinco perguntas</strong><small>Uma de Clima, uma de Biomas e outras três variadas.</small></span></div>
+    <div><b>03</b><span><strong>Veja seu resultado</strong><small>Confira seus acertos e experimente outra rodada.</small></span></div>
+   </div>
+  </section>
+  <p class="atlas-endline">✺ FEIRA CULTURAL CSA 2026 · CENTRO-OESTE · 7º ANO B</p>
+ </div>`;
  document.getElementById('startBtn').onclick=start;
  document.getElementById('startBottomBtn').onclick=start;
- document.getElementById('v4SignOut')?.addEventListener('click',()=>{clearVisitor();home()});
+ document.getElementById('atlasSignOut')?.addEventListener('click',()=>{clearVisitor();home()});
 }
 document.querySelector('.brand')?.addEventListener('click',event=>{event.preventDefault();home();window.scrollTo({top:0,behavior:'smooth'})});
 
