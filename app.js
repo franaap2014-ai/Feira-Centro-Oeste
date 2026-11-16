@@ -14,7 +14,9 @@ const state={page:'home',questions:[],answers:[],index:0,busy:false,role:null,em
 const messages=['Não desanime! Que tal tentar novamente?','Boa tentativa! O Centro-Oeste tem muito para ensinar!','Bom trabalho! Continue descobrindo nossa região!','Muito bem! Você sabe bastante sobre o Centro-Oeste!','Excelente! Você conhece muito bem a região!','Incrível! Você é especialista no Centro-Oeste!'];
 function setNav(){
  const btn=document.getElementById('adminEntry');
- btn.textContent=state.role==='admin'?'Painel ADM ↗':state.role==='operator'?'Modo Feira ↗':getVisitor()?getVisitor().username+' ↗':'Área de acesso ↗';
+ const account=getVisitor();
+ btn.textContent=state.role==='admin'?'Painel ADM ↗':state.role==='operator'?'Modo Feira ↗':account?'Minha conta · '+account.username:'Área de acesso ↗';
+ btn.title=account&&state.role!=='admin'?'Conta conectada: '+account.username:'Abrir área de acesso';
  btn.onclick=()=>{if(state.role==='admin')showAdmin();else if(state.role==='operator')showOperator();else openGuestAccess(()=>start())};
 }
 const permittedImages=['assets/cerrado.svg','assets/pantanal.svg','assets/pequi.svg','assets/pantaneiro.svg','assets/congresso.svg','assets/cavalhadas.svg'];
@@ -22,6 +24,14 @@ const imageHTML=(q)=>(permittedImages.includes(q.image)||(()=>{try{return new UR
 function svgArt(){return document.getElementById('illustration').innerHTML}
 function home(){
  state.page='home';setNav();
+ const visitor=getVisitor();
+ const regionalScenes=[
+  {name:'Cerrado',kind:'NOSSO BIOMA',image:'assets/cerrado.svg',description:'Árvores retorcidas, raízes profundas e uma natureza cheia de vida.',tone:'cerrado'},
+  {name:'Pantanal',kind:'ÁGUAS E FAUNA',image:'assets/pantanal.svg',description:'Planícies alagadas, tuiuiús, capivaras e muita biodiversidade.',tone:'pantanal'},
+  {name:'Tradições',kind:'CULTURA',image:'assets/cavalhadas.svg',description:'Catira, siriri, cururu e as Cavalhadas de Pirenópolis.',tone:'tradicoes'},
+  {name:'Sabores regionais',kind:'GASTRONOMIA',image:'assets/pequi.svg',description:'Pequi, empadão goiano, chipa e tereré.',tone:'sabores'}
+ ];
+ const sceneCards=regionalScenes.map(s=>`<article class="v4-scene v4-scene-${s.tone}"><img src="${s.image}" alt="Ilustração sobre ${escapeHTML(s.name)}" loading="lazy" width="220" height="150"><div class="v4-scene-body"><span>${escapeHTML(s.kind)}</span><h3>${escapeHTML(s.name)}</h3><p>${escapeHTML(s.description)}</p></div></article>`).join('');
  const topicCards=categories.map((cat,i)=>`<article class="v3-topic-card">
   <span class="v3-topic-icon" aria-hidden="true">${escapeHTML(cat.icon)}</span>
   <span class="v3-topic-number">0${i+1}</span>
@@ -34,15 +44,16 @@ function home(){
    <section class="v3-hero" aria-labelledby="v3-hero-title">
     <div class="v3-hero-inner">
      <span class="v3-eyebrow"><span class="v3-dot" aria-hidden="true"></span> FEIRA CULTURAL CSA 2026 <span class="v3-small-sep">/</span> 7º ANO B</span>
-     <h1 id="v3-hero-title">Explore o <span>Centro-Oeste.</span></h1>
-     <p class="v3-hero-lead">Uma região cheia de histórias para descobrir.</p>
-     <p class="v3-hero-description">Das paisagens do Pantanal aos sabores e tradições do Cerrado: embarque em uma viagem de conhecimento pelo coração do Brasil.</p>
+     <h1 id="v3-hero-title">Descubra o <span>Centro-Oeste.</span></h1>
+     <p class="v3-hero-lead">Natureza, cultura e tradição no coração do Brasil.</p>
+     <p class="v3-hero-description">De Goiás ao Pantanal, de Brasília ao Cerrado: explore Mato Grosso, Mato Grosso do Sul, a culinária e as festas que fazem nossa região única.</p>
      <div class="v3-hero-buttons">
-      <button type="button" id="startBtn" class="v3-primary">Começar o quiz <span aria-hidden="true">↗</span></button>
+      <button type="button" id="startBtn" class="v3-primary">${visitor?'Continuar jogando':'Começar o quiz'} <span aria-hidden="true">↗</span></button>
       <a href="#como-jogar" class="v3-outline">Como jogar <span aria-hidden="true">↓</span></a>
      </div>
+     ${visitor&&state.role!=='admin'?'<div class="v4-session-pill"><span class="v4-session-dot"></span><span>Conectado como <strong>'+escapeHTML(visitor.username)+'</strong></span><button type="button" id="v4SignOut">Sair</button></div>':'<p class="v4-session-note">Entre uma vez e continue conectado nas próximas visitas neste aparelho.</p>'}
     </div>
-    <div class="v3-photo-location"><span class="v3-location-icon" aria-hidden="true">⌖</span><span>PANTANAL <small>MATO GROSSO · BRASIL</small></span></div>
+    <div class="v3-photo-location"><span class="v3-location-icon" aria-hidden="true">⌖</span><span>REGIÃO CENTRO-OESTE <small>GO · MT · MS · DF · BRASIL</small></span></div>
    </section>
    <div class="v3-stat-strip" aria-label="Informações do desafio">
     <div class="v3-stat"><strong>30</strong><span>perguntas no banco</span></div>
@@ -50,7 +61,15 @@ function home(){
     <div class="v3-stat"><strong>06</strong><span>temas para explorar</span></div>
     <div class="v3-stat"><strong>10</strong><span>questões fixas de Clima</span></div>
    </div>
-   <p class="v3-photo-caption">Fotografia do Pantanal inspirada na referência enviada · Crédito da foto de fundo: <a href="https://commons.wikimedia.org/wiki/File:Pantanal,_Mato_Grosso,_Brasil.jpg" target="_blank" rel="noopener noreferrer">Filipefrazao / Wikimedia Commons, CC BY-SA 3.0</a> · sobreposição de cor adaptada.</p>
+   <p class="v3-photo-caption">Pantanal, uma paisagem da região Centro-Oeste. Foto: <a href="https://commons.wikimedia.org/wiki/File:Pantanal,_Mato_Grosso,_Brasil.jpg" target="_blank" rel="noopener noreferrer">Filipefrazao / Wikimedia Commons, CC BY-SA 3.0</a>.</p>
+   <section class="v4-region" aria-labelledby="v4-region-title">
+    <div class="v4-region-heading"><div><span class="v3-section-kicker">CONHEÇA NOSSA REGIÃO</span><h2 id="v4-region-title">O Centro-Oeste é <em>muito mais.</em></h2></div><p>Do Cerrado ao Pantanal, das Cavalhadas aos sabores de Goiás: uma viagem pelas paisagens e tradições regionais.</p></div>
+    <div class="v4-scenes">${sceneCards}</div>
+    <div class="v4-states" aria-label="Estados e Distrito Federal do Centro-Oeste">
+     <span>NOSSO MAPA</span>
+     <strong><b>GO</b> Goiás</strong><strong><b>MT</b> Mato Grosso</strong><strong><b>MS</b> Mato Grosso do Sul</strong><strong><b>DF</b> Distrito Federal</strong>
+    </div>
+   </section>
    <section class="v3-section v3-topics" id="temas" aria-labelledby="v3-topics-title">
     <div class="v3-section-heading">
      <div><span class="v3-section-kicker">01 / CONHEÇA NOSSO QUIZ</span><h2 id="v3-topics-title">O que vamos <em>descobrir?</em></h2></div>
@@ -61,7 +80,7 @@ function home(){
    <section class="v3-how-section" id="como-jogar" aria-labelledby="v3-how-title">
     <div class="v3-how-heading"><span class="v3-section-kicker">02 / SUA VEZ DE EXPLORAR</span><h2 id="v3-how-title">Aprender pode ser <em>uma aventura.</em></h2><p>Um desafio rápido para testar seus conhecimentos. Sem complicação.</p><button id="startBottomBtn" type="button" class="v3-primary v3-bottom-btn">Vamos jogar <span aria-hidden="true">↗</span></button></div>
     <div class="v3-steps">
-     <div><span>01</span><div><strong>Entre no quiz</strong><p>Crie seu usuário ou entre na sua conta.</p></div></div>
+     <div><span>01</span><div><strong>Entre uma vez</strong><p>Sua conta continua conectada neste aparelho para as próximas partidas.</p></div></div>
      <div><span>02</span><div><strong>Responda 5 perguntas</strong><p>Uma de Clima e outras quatro de temas variados.</p></div></div>
      <div><span>03</span><div><strong>Veja como se saiu</strong><p>Confira sua pontuação e descubra curiosidades.</p></div></div>
     </div>
@@ -70,13 +89,7 @@ function home(){
   </div>`;
  document.getElementById('startBtn').onclick=start;
  document.getElementById('startBottomBtn').onclick=start;
- const visitor=getVisitor();
- if(visitor&&state.role!=='admin'){
-  const switchBtn=document.createElement('button');switchBtn.type='button';switchBtn.className='v3-switch-guest';
-  switchBtn.textContent='Trocar participante ('+visitor.username+')';
-  switchBtn.onclick=()=>{clearVisitor();home()};
-  document.querySelector('.v3-hero-buttons')?.appendChild(switchBtn);
- }
+ document.getElementById('v4SignOut')?.addEventListener('click',()=>{clearVisitor();home()});
 }
 document.querySelector('.brand')?.addEventListener('click',event=>{event.preventDefault();home();window.scrollTo({top:0,behavior:'smooth'})});
 

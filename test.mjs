@@ -163,3 +163,11 @@ assert.ok(guestSessions.includes('localStorage.setItem(STORAGE_KEY'));
 assert.ok(guestSessions.includes('90 dias sem atividade'));
 assert.ok(appSource.includes('mantendo a sessão local'));
 console.log('✓ Sessões permanecem salvas no aparelho e não são apagadas por falhas temporárias.');
+
+// Centro-Oeste completo, destaques locais e sessão mantida na primeira tela.
+for(const place of ['Goiás','Mato Grosso','Mato Grosso do Sul','Distrito Federal'])assert.ok(appSource.includes(place),'Faltou '+place);
+for(const art of ['assets/cerrado.svg','assets/pantanal.svg','assets/cavalhadas.svg','assets/pequi.svg'])assert.ok(appSource.includes(art),'Faltou imagem '+art);
+assert.ok(appSource.includes('v4-session-pill')&&appSource.includes('v4SignOut'));
+assert.ok(appSource.includes("visitor?'Continuar jogando':'Começar o quiz'"));
+assert.ok(appSource.includes('REGIÃO CENTRO-OESTE'));
+console.log('✓ Paisagens e cultura do Centro-Oeste + botão continuar conectado e sair.');
