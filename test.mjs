@@ -132,15 +132,15 @@ console.log('✓ Cinco perguntas por partida e seis temas, incluindo Clima fixo.
 
 
 // Homepage reformulada em rosa e branco, mantendo login, músicas e quiz.
-assert.ok(appSource.includes('class="v2-hero"'));
+assert.ok(appSource.includes('class="v3-hero"'));
 assert.ok(appSource.includes('id="startBtn"'));
 assert.ok(appSource.includes('id="startBottomBtn"'));
 assert.ok(appSource.includes('id="como-jogar"'));
 assert.ok(appSource.includes('O que vamos'));
 assert.ok(appSource.includes('Pantanal'));
-assert.ok(readFileSync('style.css','utf8').includes('HOME V2'));
-assert.ok(readFileSync('index.html','utf8').includes('topbar topbar-v2'));
-console.log('✓ Tela inicial rosa e branca, acessível e com ações de jogo preservadas.');
+assert.ok(readFileSync('style.css','utf8').includes('HOME V3'));
+assert.ok(readFileSync('index.html','utf8').includes('topbar topbar-v3'));
+console.log('✓ Novo hero fotográfico do Pantanal, design responsivo e ações de jogo preservadas.');
 
 assert.deepEqual((()=>{const q=questions.find(x=>x.id==='CL01');return [q.text,q.options,q.correct,q.category,q.fixed]})(),["Qual é o clima predominante na região Centro-Oeste?",["Equatorial","Tropical","Subtropical","Semiárido"],1,"clima",true]);
 assert.deepEqual((()=>{const q=questions.find(x=>x.id==='CL02');return [q.text,q.options,q.correct,q.category,q.fixed]})(),["Como são as estações do ano no Centro-Oeste?",["Verão seco e inverno chuvoso","Frio o ano inteiro","Verão chuvoso e inverno seco","Chuva durante todo o ano"],2,"clima",true]);
