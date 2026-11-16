@@ -113,3 +113,8 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 #adminSetupDialog .login-content {gap:12px}
 #adminSetupDialog .login-content h2 {font-size:clamp(27px,5vw,36px)}
 #adminSetupDialog .login-content input {width:100%}
+
+/* Campos de criação e acesso ADM na ordem solicitada */
+.adm-form-fields{display:flex;flex-direction:column;gap:10px}
+.adm-form-fields[hidden]{display:none!important}
+#loginEmail[readonly],#adminSetupEmail[readonly]{background:#f9edf3;color:#6c4d60;cursor:default}

@@ -56,21 +56,52 @@ function result(){
  const attempt={score,questionIds:state.questions.map(q=>q.id),answers:state.answers.map(a=>({question_id:a.question_id,answer_id:a.answer_id,correct:a.correct})),questionSnapshot,mode:state.mode,participantId:state.mode==='fair'?getVisitor()?.id||null:null,guestToken:state.role==='admin'?null:getVisitor()?.token||null};
  if(configured)saveAttempt(attempt).then(r=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent=r.saved?'✓ Participação registrada com sucesso.':'Pontuação não salva.'}).catch(()=>{const el=document.getElementById('savedMsg');if(el&&state.page==='results')el.textContent='Não foi possível salvar online. O resultado permanece válido.'});
 }
-function showLogin(){
- if(!configured){
-  if(!loginDialog.open)loginDialog.showModal();
-  document.getElementById('loginStatus').textContent='Banco de autenticação indisponível.';
-  return;
- }
+let admMode='create';
+function setAdminMode(mode){
+ admMode=mode==='login'?'login':'create';
+ const creating=admMode==='create';
+ document.getElementById('admCreateFields').hidden=!creating;
+ document.getElementById('admLoginFields').hidden=creating;
+ document.getElementById('admCreatePassword').required=creating;
+ document.getElementById('admCreateConfirm').required=creating;
+ document.getElementById('loginPassword').required=!creating;
+ document.getElementById('loginTitle').textContent=creating?'Para ADM':'Entrar como ADM';
+ document.getElementById('loginIntro').textContent=creating?
+  'Escolha sua senha diretamente no site. Só uma sessão ADM autorizada pode salvá-la.':
+  'Entre com a senha cadastrada para o administrador.';
+ document.getElementById('loginSubmit').textContent=creating?'Salvar senha ADM ↗':'Entrar no painel ADM ↗';
+ document.getElementById('toggleAdminMode').textContent=creating?'Já tenho senha — Entrar':'Voltar para criar senha';
  document.getElementById('loginStatus').textContent='';
- if(!loginDialog.open)loginDialog.showModal();
- document.getElementById('loginPassword').focus();
 }
+function showLogin(mode='create'){
+ if(!loginDialog.open)loginDialog.showModal();
+ setAdminMode(mode);
+ if(!configured){document.getElementById('loginStatus').textContent='O banco de autenticação está indisponível.';return}
+ document.getElementById(mode==='login'?'loginPassword':'admCreatePassword').focus();
+}
+document.getElementById('toggleAdminMode').onclick=()=>{
+ setAdminMode(admMode==='create'?'login':'create');
+ document.getElementById(admMode==='create'?'admCreatePassword':'loginPassword').focus();
+};
 loginForm.addEventListener('submit',async event=>{
  event.preventDefault();
  const btn=document.getElementById('loginSubmit'),status=document.getElementById('loginStatus');
- btn.disabled=true;status.textContent='Verificando acesso ADM…';
+ btn.disabled=true;status.textContent='Verificando autorização…';
  try{
+  if(admMode==='create'){
+   const first=document.getElementById('admCreatePassword').value;
+   const second=document.getElementById('admCreateConfirm').value;
+   if(first!==second)throw new Error('As senhas não coincidem.');
+   if(await getRole()!=='admin')throw new Error('É necessário estar autenticado como ADM para criar ou alterar a senha. Digitar apenas o Gmail não autoriza a troca.');
+   await changeCurrentPassword(first);
+   document.getElementById('admCreatePassword').value='';
+   document.getElementById('admCreateConfirm').value='';
+   signOut();state.role=null;state.email=null;setNav();
+   setAdminMode('login');
+   status.textContent='✓ Senha salva com segurança. Agora entre com ela.';
+   return;
+  }
+  status.textContent='Verificando login ADM…';
   const role=await signIn(document.getElementById('loginEmail').value,document.getElementById('loginPassword').value);
   if(role!=='admin'){signOut();throw new Error('Esta conta não possui acesso ADM.')}
   state.role='admin';state.mode='test';state.email=document.getElementById('loginEmail').value;
@@ -78,8 +109,8 @@ loginForm.addEventListener('submit',async event=>{
  }catch(error){
   const message=String(error?.message||'');
   status.textContent=/invalid login credentials|invalid credentials/i.test(message)?
-   'Senha incorreta. Confira a senha escolhida ou use seu link privado de configuração.':
-   message||'Não foi possível entrar.';
+   'Senha incorreta. Confira a senha cadastrada.':
+   message||'Não foi possível concluir.';
  }finally{btn.disabled=false}
 });
 function openAdminPasswordForm(setupToken=null){
@@ -105,7 +136,7 @@ function openAdminPasswordForm(setupToken=null){
    if(setupToken){await saveAdminSetupPassword(setupToken,password)}
    else{await changeCurrentPassword(password)}
    form.reset();dialog.close();signOut();state.role=null;state.email=null;
-   setNav();showLogin();
+   setNav();showLogin('login');
    document.getElementById('loginStatus').textContent='✓ Senha criada! Entre com a senha que você acabou de escolher.';
   }catch(error){status.textContent=String(error?.message||'Não foi possível criar a senha.')}
   finally{submit.disabled=false}
@@ -118,18 +149,6 @@ function setupPrivateAdminPasswordScreen(){
   history.replaceState(null,'',location.pathname+location.search);
   openAdminPasswordForm(setupToken);
  }
- document.getElementById('openCreateAdminPassword').onclick=async()=>{
-  const status=document.getElementById('loginStatus');
-  status.textContent='Verificando autorização ADM…';
-  try{
-   if(await getRole()!=='admin'){
-    status.textContent='Para criar uma senha sem e-mail, você precisa estar autenticado como ADM ou usar um link privado de configuração. Apenas informar o endereço da conta não é suficiente.';
-    return;
-   }
-   loginDialog.close();
-   openAdminPasswordForm();
-  }catch(error){status.textContent='Não foi possível confirmar a sessão ADM.'}
- };
 }
 
 document.getElementById('closeLogin').onclick=()=>loginDialog.close();

@@ -38,30 +38,40 @@
 <dialog id="loginDialog" class="login-dialog" aria-labelledby="loginTitle">
  <form id="loginForm" class="login-content">
   <button id="closeLogin" type="button" class="modal-close" aria-label="Fechar">×</button>
-  <span class="eyebrow">✦ ÁREA RESTRITA</span>
-  <h2 id="loginTitle">Acesso de ADM</h2>
-  <p>Entre com a senha que você criou. Apenas a administração pode acessar este painel.</p>
-  <input id="loginEmail" type="hidden" value="Franaap2014@gmail.com" />
-  <label for="loginPassword">Senha</label>
-  <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Sua senha ADM" />
+  <span class="eyebrow">✦ ACESSO RESTRITO</span>
+  <h2 id="loginTitle">Para ADM</h2>
+  <p id="loginIntro">Crie sua senha aqui no site. Para salvar, você precisa estar autorizado como administrador.</p>
+  <label for="loginEmail">Email</label>
+  <input id="loginEmail" type="email" autocomplete="username" value="Franaap2014@gmail.com" readonly required />
+  <div class="adm-form-fields" id="admCreateFields">
+    <label for="admCreatePassword">Crie sua senha</label>
+    <input id="admCreatePassword" type="password" autocomplete="new-password" minlength="12" required placeholder="Pelo menos 12 caracteres" />
+    <label for="admCreateConfirm">Confirme sua senha</label>
+    <input id="admCreateConfirm" type="password" autocomplete="new-password" minlength="12" required placeholder="Repita sua senha" />
+  </div>
+  <div class="adm-form-fields" id="admLoginFields" hidden>
+    <label for="loginPassword">Senha</label>
+    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Sua senha ADM" />
+  </div>
   <p id="loginStatus" class="form-status" role="status"></p>
-  <button id="loginSubmit" type="submit" class="button button-primary full">Entrar no painel ADM ↗</button>
-  <button id="openCreateAdminPassword" type="button" class="admin-forgot">Criar senha</button>
-  <small>A senha é verificada pelo Supabase e não aparece no código público.</small>
+  <button id="loginSubmit" type="submit" class="button button-primary full">Salvar senha ADM ↗</button>
+  <button id="toggleAdminMode" type="button" class="admin-forgot">Já tenho senha — Entrar</button>
+  <small>Somente a conta ADM autorizada pode criar ou alterar a senha. Não é necessário receber e-mail.</small>
  </form>
 </dialog>
 <dialog id="adminSetupDialog" class="login-dialog" aria-labelledby="adminSetupTitle">
  <form id="adminSetupForm" class="login-content">
   <button id="adminSetupClose" type="button" class="modal-close" aria-label="Fechar">×</button>
   <span class="eyebrow">✦ CONFIGURAÇÃO PRIVADA</span>
-  <h2 id="adminSetupTitle">Criar senha</h2>
-  <p>Escolha a senha do ADM. Você não precisa receber nenhum e-mail.</p>
-  <label for="adminSetupPassword">Criar senha</label>
+  <h2 id="adminSetupTitle">Para ADM</h2>
+  <label for="adminSetupEmail">Email</label>
+  <input id="adminSetupEmail" type="email" value="Franaap2014@gmail.com" readonly />
+  <label for="adminSetupPassword">Crie sua senha</label>
   <input id="adminSetupPassword" type="password" minlength="12" required autocomplete="new-password" placeholder="Pelo menos 12 caracteres" />
   <label for="adminSetupConfirm">Confirme sua senha</label>
   <input id="adminSetupConfirm" type="password" minlength="12" required autocomplete="new-password" placeholder="Digite a senha novamente" />
   <p id="adminSetupStatus" class="form-status" role="status"></p>
-  <button id="adminSetupSubmit" type="submit" class="button button-primary full">Salvar senha ↗</button>
+  <button id="adminSetupSubmit" type="submit" class="button button-primary full">Salvar senha ADM ↗</button>
   <small id="adminSetupInfo">Configuração autorizada do administrador.</small>
  </form>
 </dialog>

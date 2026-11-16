@@ -83,9 +83,14 @@ assert.ok(!adminHTML.includes('tkDJY%q!vNky4ZKtVZ8FzY'));
 console.log('✓ Criação privada de senha ADM dentro do site, sem e-mail.');
 
 
-// Administradores autenticados podem alterar a senha sem e-mail.
-assert.ok(adminHTML.includes('id="openCreateAdminPassword"'));
-assert.ok(adminHTML.includes('id="adminSetupInfo"'));
-assert.ok(adminJS.includes("await changeCurrentPassword(password)"));
+// Formulário ADM com três campos na ordem solicitada e autenticação obrigatória.
+assert.ok(adminHTML.includes('id="loginEmail"'));
+assert.ok(adminHTML.includes('id="admCreatePassword"'));
+assert.ok(adminHTML.includes('id="admCreateConfirm"'));
+const admSection=adminHTML.slice(adminHTML.indexOf('<dialog id="loginDialog"'),adminHTML.indexOf('<dialog id="adminSetupDialog"'));
+assert.ok(admSection.indexOf('for="loginEmail"')<admSection.indexOf('for="admCreatePassword"'));
+assert.ok(admSection.indexOf('for="admCreatePassword"')<admSection.indexOf('for="admCreateConfirm"'));
 assert.ok(adminJS.includes("if(await getRole()!=='admin')"));
-console.log('✓ Criação de senha sem email condicionada à sessão ADM autenticada.');
+assert.ok(adminJS.includes('await changeCurrentPassword(first)'));
+assert.ok(adminJS.includes("setAdminMode('login')"));
+console.log('✓ Email, criar senha, confirmar senha e acesso ADM com permissão verificada.');
