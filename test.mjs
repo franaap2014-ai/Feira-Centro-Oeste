@@ -25,7 +25,7 @@ assert.equal(seen.size,20);assert.equal(correctPositions.size,4);assert.ok(order
 assert.deepEqual(shuffle([1,2,3,4],()=>0),[2,3,4,1]);
 console.log('✓ 40 questões válidas; 1.200 partidas simuladas; sorteio e respostas aprovados.');
 
-const requiredModules=['app.js','backend.js','music.js','auth-ui.js','admin-music.js','questions.js'];
+const requiredModules=['app.js','backend.js','music.js','auth-ui.js','admin-music.js','questions.js','studio.js','guest.js','neon-google.js'];
 const buildSource=readFileSync('build.mjs','utf8');
 for(const file of requiredModules){
  assert.ok(buildSource.includes("'"+file+"'"),'O build precisa publicar '+file);
@@ -209,3 +209,9 @@ for(let n=0;n<500;n++){
 assert.ok(appSource.includes('de Pontos Turísticos em planejamento'));
 assert.ok(readFileSync('studio.js','utf8').includes('10 perguntas reservadas para Pontos Turísticos'));
 console.log('✓ Apenas Clima, Biomas e Pontos Turísticos; 20 reais e 10 reservas sem alternativas inventadas.');
+
+
+// Regressão: arquivo do painel é importado pelo app e deve sempre ter sintaxe válida.
+assert.ok(readFileSync('studio.js','utf8').includes("host.innerHTML='<section class=\"admin-panel studio-panel\">'"));
+assert.ok(!readFileSync('studio.js','utf8').includes(":'')+<div class="));
+console.log('✓ Painel ADM com sintaxe válida; tela inicial não será bloqueada pelo import.');
