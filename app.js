@@ -82,15 +82,17 @@ loginForm.addEventListener('submit',async event=>{
    message||'Não foi possível entrar.';
  }finally{btn.disabled=false}
 });
-function setupPrivateAdminPasswordScreen(){
- const params=new URLSearchParams(location.hash.slice(1));
- const setupToken=params.get('adm_setup');
- if(!setupToken)return;
- history.replaceState(null,'',location.pathname+location.search);
+function openAdminPasswordForm(setupToken=null){
  const dialog=document.getElementById('adminSetupDialog');
  const form=document.getElementById('adminSetupForm');
  const status=document.getElementById('adminSetupStatus');
- dialog.showModal();
+ const info=document.getElementById('adminSetupInfo');
+ form.reset();status.textContent='';
+ info.textContent=setupToken?
+  'Link privado de uso único. A senha será salva com segurança.':
+  'Sua sessão ADM foi confirmada. A nova senha será salva com segurança.';
+ if(!dialog.open)dialog.showModal();
+ document.getElementById('adminSetupPassword').focus();
  document.getElementById('adminSetupClose').onclick=()=>dialog.close();
  form.onsubmit=async event=>{
   event.preventDefault();
@@ -100,15 +102,33 @@ function setupPrivateAdminPasswordScreen(){
   const submit=document.getElementById('adminSetupSubmit');
   submit.disabled=true;status.textContent='Salvando senha com segurança…';
   try{
-   await saveAdminSetupPassword(setupToken,password);
-   form.reset();
-   dialog.close();
-   signOut();
-   showLogin();
-   document.getElementById('loginStatus').textContent='✓ Senha criada! Agora entre com a senha que você acabou de escolher.';
-  }catch(error){
-   status.textContent=String(error?.message||'Não foi possível criar a senha.');
-  }finally{submit.disabled=false}
+   if(setupToken){await saveAdminSetupPassword(setupToken,password)}
+   else{await changeCurrentPassword(password)}
+   form.reset();dialog.close();signOut();state.role=null;state.email=null;
+   setNav();showLogin();
+   document.getElementById('loginStatus').textContent='✓ Senha criada! Entre com a senha que você acabou de escolher.';
+  }catch(error){status.textContent=String(error?.message||'Não foi possível criar a senha.')}
+  finally{submit.disabled=false}
+ };
+}
+function setupPrivateAdminPasswordScreen(){
+ const params=new URLSearchParams(location.hash.slice(1));
+ const setupToken=params.get('adm_setup');
+ if(setupToken){
+  history.replaceState(null,'',location.pathname+location.search);
+  openAdminPasswordForm(setupToken);
+ }
+ document.getElementById('openCreateAdminPassword').onclick=async()=>{
+  const status=document.getElementById('loginStatus');
+  status.textContent='Verificando autorização ADM…';
+  try{
+   if(await getRole()!=='admin'){
+    status.textContent='Para criar uma senha sem e-mail, você precisa estar autenticado como ADM ou usar um link privado de configuração. Apenas informar o endereço da conta não é suficiente.';
+    return;
+   }
+   loginDialog.close();
+   openAdminPasswordForm();
+  }catch(error){status.textContent='Não foi possível confirmar a sessão ADM.'}
  };
 }
 

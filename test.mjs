@@ -81,3 +81,11 @@ assert.ok(!adminJS.includes('setupAdminPasswordRecovery()'));
 assert.ok(!adminHTML.includes('localhost:3000'));
 assert.ok(!adminHTML.includes('tkDJY%q!vNky4ZKtVZ8FzY'));
 console.log('✓ Criação privada de senha ADM dentro do site, sem e-mail.');
+
+
+// Administradores autenticados podem alterar a senha sem e-mail.
+assert.ok(adminHTML.includes('id="openCreateAdminPassword"'));
+assert.ok(adminHTML.includes('id="adminSetupInfo"'));
+assert.ok(adminJS.includes("await changeCurrentPassword(password)"));
+assert.ok(adminJS.includes("if(await getRole()!=='admin')"));
+console.log('✓ Criação de senha sem email condicionada à sessão ADM autenticada.');

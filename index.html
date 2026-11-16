@@ -46,6 +46,7 @@
   <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Sua senha ADM" />
   <p id="loginStatus" class="form-status" role="status"></p>
   <button id="loginSubmit" type="submit" class="button button-primary full">Entrar no painel ADM ↗</button>
+  <button id="openCreateAdminPassword" type="button" class="admin-forgot">Criar senha</button>
   <small>A senha é verificada pelo Supabase e não aparece no código público.</small>
  </form>
 </dialog>
@@ -61,7 +62,7 @@
   <input id="adminSetupConfirm" type="password" minlength="12" required autocomplete="new-password" placeholder="Digite a senha novamente" />
   <p id="adminSetupStatus" class="form-status" role="status"></p>
   <button id="adminSetupSubmit" type="submit" class="button button-primary full">Salvar senha ↗</button>
-  <small>Este acesso é protegido por um link privado e temporário, que só funciona uma vez.</small>
+  <small id="adminSetupInfo">Configuração autorizada do administrador.</small>
  </form>
 </dialog>
 <template id="illustration">
