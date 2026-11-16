@@ -3,9 +3,9 @@ import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {questions,categories,validateBank,makeSession,shuffle} from './questions.js';
 assert.equal(validateBank(),true);
-assert.equal(questions.length,30);
-assert.equal(new Set(questions.map(q=>q.id)).size,30);
-for(const category of categories){assert.equal(questions.filter(q=>q.category===category.id).length,category.id==='clima'?10:4)}
+assert.equal(questions.length,40);
+assert.equal(new Set(questions.map(q=>q.id)).size,40);
+for(const category of categories){assert.equal(questions.filter(q=>q.category===category.id).length,['clima','biomas_vegetacao'].includes(category.id)?10:4)}
 for(const q of questions){assert.equal(q.options.length,4);assert.ok(q.correct>=0&&q.correct<=3);assert.equal(new Set(q.options).size,4)}
 const seen=new Set(); const correctPositions=new Set(); const orders=new Set();
 for(let n=0;n<1200;n++){
@@ -21,9 +21,9 @@ for(let n=0;n<1200;n++){
  }
  orders.add(session.map(q=>q.category).join(','));
 }
-assert.equal(seen.size,30);assert.equal(correctPositions.size,4);assert.ok(orders.size>20);
+assert.equal(seen.size,40);assert.equal(correctPositions.size,4);assert.ok(orders.size>20);
 assert.deepEqual(shuffle([1,2,3,4],()=>0),[2,3,4,1]);
-console.log('✓ 30 questões válidas; 1.200 partidas simuladas; sorteio e respostas aprovados.');
+console.log('✓ 40 questões válidas; 1.200 partidas simuladas; sorteio e respostas aprovados.');
 
 const requiredModules=['app.js','backend.js','music.js','auth-ui.js','admin-music.js','questions.js'];
 const buildSource=readFileSync('build.mjs','utf8');
@@ -115,20 +115,20 @@ console.log('✓ Google Neon verifica identidade antes de liberar criação da s
 
 
 // O Pantanal substitui Brasília no tema e na ilustração inicial.
-assert.equal(categories.length,6);
-assert.equal(categories[5].id,'pantanal');
-assert.equal(categories[5].label,'Pantanal');
+assert.equal(categories.length,7);
+assert.equal(categories[6].id,'pantanal');
+assert.equal(categories[6].label,'Pantanal');
 assert.equal(questions.filter(q=>q.category==='pantanal').length,4);
 assert.equal(questions.filter(q=>q.category==='brasilia').length,0);
 assert.ok(readFileSync('index.html','utf8').includes('Paisagem do Pantanal com tuiuiú'));
 assert.ok(!readFileSync('index.html','utf8').includes('Congresso Nacional de Brasília e paisagem'));
-assert.ok(appSource.includes('30 no banco · 5 por partida'));
+assert.ok(appSource.includes('40 no banco · 5 por partida'));
 for(let i=0;i<1000;i++){
  const round=makeFlexibleSession(questions);
  assert.equal(round.length,5);
  assert.equal(new Set(round.map(q=>q.category)).size,5);
 }
-console.log('✓ Cinco perguntas por partida e seis temas, incluindo Clima fixo.');
+console.log('✓ Cinco perguntas por partida e sete temas, incluindo Clima e Biomas.');
 
 
 // Homepage reformulada em rosa e branco, mantendo login, músicas e quiz.
@@ -171,3 +171,17 @@ assert.ok(appSource.includes('v4-session-pill')&&appSource.includes('v4SignOut')
 assert.ok(appSource.includes("visitor?'Continuar jogando':'Começar o quiz'"));
 assert.ok(appSource.includes('REGIÃO CENTRO-OESTE'));
 console.log('✓ Paisagens e cultura do Centro-Oeste + botão continuar conectado e sair.');
+
+for(const [idx,[text,options,correct]] of [["Qual é a vegetação predominante na Região Centro-Oeste?",["Caatinga","Cerrado","Mata Atlântica","Pampas"],1],["Qual é uma característica do Cerrado?",["Árvores baixas e troncos retorcidos","Muitas árvores cobertas de neve","Vegetação totalmente rasteira","Florestas muito fechadas e úmidas"],0],["Qual bioma também está presente no Centro-Oeste?",["Pampa","Pantanal","Mata de Araucárias","Manguezal"],1],["Como é a vegetação do Pantanal?",["Apenas cactos","Somente árvores altas","Mistura de campos, árvores e plantas aquáticas","Apenas gramíneas secas"],2],["Qual fator influencia a vegetação do Cerrado?",["Neve constante","Clima tropical, com períodos secos e chuvosos","Frio intenso durante todo o ano","Clima polar"],1],["Qual planta é comum no Cerrado?",["Pequi","Pinheiro","Maçã","Oliveira"],0],["O que acontece com muitas plantas do Cerrado durante a seca?",["Crescem debaixo da água","Adaptam-se à falta de água","Ficam cobertas de neve","Desaparecem completamente"],1],["Qual é uma ameaça à vegetação do Centro-Oeste?",["Desmatamento","Nevascas","Terremotos","Geleiras"],0],["Qual estado brasileiro possui grande parte do Pantanal?",["São Paulo","Mato Grosso do Sul","Paraná","Rio de Janeiro"],1],["Por que a vegetação do Centro-Oeste é importante?",["Porque não possui animais","Porque serve apenas para decoração","Porque abriga animais e mantém o equilíbrio ambiental","Porque impede todas as chuvas"],2]].entries()){
+ const q=questions.find(q=>q.id==='BV'+String(idx+1).padStart(2,'0'));
+ assert.ok(q,'Falta pergunta de Biomas '+(idx+1));
+ assert.deepEqual([q.text,q.options,q.correct,q.category],[text,options,correct,'biomas_vegetacao']);
+}
+for(let i=0;i<1200;i++){
+ const round=makeFlexibleSession(questions);
+ assert.equal(round.length,5);
+ assert.equal(round.filter(q=>q.category==='clima').length,1);
+ assert.equal(round.filter(q=>q.category==='biomas_vegetacao').length,1);
+ assert.equal(new Set(round.map(q=>q.category)).size,5);
+}
+console.log('✓ As 10 novas questões de Biomas e Vegetação, os 10 gabaritos e a seleção de 5 perguntas foram conferidos.');

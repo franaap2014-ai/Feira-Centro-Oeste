@@ -1,6 +1,7 @@
-// 30 questões-base: 10 de Clima imutáveis e 20 dos outros cinco temas.
+// 40 questões-base: 10 de Clima imutáveis, 10 de Biomas e Vegetação, 20 dos demais temas.
 export const categories = [
- {id:"clima",label:"Clima",icon:"🌦️",subtitle:"Clima e biomas"},
+ {id:"clima",label:"Clima",icon:"🌦️",subtitle:"Estações e clima tropical"},
+ {id:"biomas_vegetacao",label:"Biomas e Vegetação",icon:"🌳",subtitle:"Cerrado, Pantanal e espécies nativas"},
  {id:"geografia",label:"Geografia",icon:"🗺️",subtitle:"Estados e capitais"},
  {id:"culinaria",label:"Culinária",icon:"🍲",subtitle:"Sabores regionais"},
  {id:"costumes",label:"Costumes",icon:"🎶",subtitle:"Festas e tradições"},
@@ -19,6 +20,16 @@ export const questions = [
  {id:'CL08',category:'clima',text:"Por que muitas plantas do Cerrado possuem raízes profundas?",options:["Para alcançar água em camadas profundas do solo","Para sobreviver à neve","Para evitar o contato com o sol","Para viver dentro da água"],correct:0,fact:'',fixed:true},
  {id:'CL09',category:'clima',text:"Qual fenômeno natural é comum no Cerrado durante a estação seca?",options:["Nevascas","Geadas constantes","Tempestades de neve","Queimadas"],correct:3,fact:'',fixed:true},
  {id:'CL10',category:'clima',text:"Quais são os três principais biomas encontrados na região Centro-Oeste?",options:["Caatinga, Pampa e Mata Atlântica","Cerrado, Pantanal e Amazônia","Pampa, Cerrado e Caatinga","Amazônia, Pampa e Caatinga"],correct:1,fact:'',fixed:true},
+ {id:'BV01',category:'biomas_vegetacao',text:"Qual é a vegetação predominante na Região Centro-Oeste?",options:["Caatinga","Cerrado","Mata Atlântica","Pampas"],correct:1,fact:''},
+ {id:'BV02',category:'biomas_vegetacao',text:"Qual é uma característica do Cerrado?",options:["Árvores baixas e troncos retorcidos","Muitas árvores cobertas de neve","Vegetação totalmente rasteira","Florestas muito fechadas e úmidas"],correct:0,fact:''},
+ {id:'BV03',category:'biomas_vegetacao',text:"Qual bioma também está presente no Centro-Oeste?",options:["Pampa","Pantanal","Mata de Araucárias","Manguezal"],correct:1,fact:''},
+ {id:'BV04',category:'biomas_vegetacao',text:"Como é a vegetação do Pantanal?",options:["Apenas cactos","Somente árvores altas","Mistura de campos, árvores e plantas aquáticas","Apenas gramíneas secas"],correct:2,fact:''},
+ {id:'BV05',category:'biomas_vegetacao',text:"Qual fator influencia a vegetação do Cerrado?",options:["Neve constante","Clima tropical, com períodos secos e chuvosos","Frio intenso durante todo o ano","Clima polar"],correct:1,fact:''},
+ {id:'BV06',category:'biomas_vegetacao',text:"Qual planta é comum no Cerrado?",options:["Pequi","Pinheiro","Maçã","Oliveira"],correct:0,fact:''},
+ {id:'BV07',category:'biomas_vegetacao',text:"O que acontece com muitas plantas do Cerrado durante a seca?",options:["Crescem debaixo da água","Adaptam-se à falta de água","Ficam cobertas de neve","Desaparecem completamente"],correct:1,fact:''},
+ {id:'BV08',category:'biomas_vegetacao',text:"Qual é uma ameaça à vegetação do Centro-Oeste?",options:["Desmatamento","Nevascas","Terremotos","Geleiras"],correct:0,fact:''},
+ {id:'BV09',category:'biomas_vegetacao',text:"Qual estado brasileiro possui grande parte do Pantanal?",options:["São Paulo","Mato Grosso do Sul","Paraná","Rio de Janeiro"],correct:1,fact:''},
+ {id:'BV10',category:'biomas_vegetacao',text:"Por que a vegetação do Centro-Oeste é importante?",options:["Porque não possui animais","Porque serve apenas para decoração","Porque abriga animais e mantém o equilíbrio ambiental","Porque impede todas as chuvas"],correct:2,fact:''},
   {id:'G01',category:'geografia',text:'Quais estados fazem parte da Região Centro-Oeste?',options:['Goiás, Mato Grosso e Mato Grosso do Sul','Paraná, Goiás e Bahia','São Paulo, Goiás e Pará','Mato Grosso, Tocantins e Minas Gerais'],correct:0,fact:'Além desses três estados, a região inclui o Distrito Federal.'},
   {id:'G02',category:'geografia',text:'Qual é a capital de Mato Grosso?',options:['Goiânia','Campo Grande','Cuiabá','Palmas'],correct:2,fact:'Cuiabá é a capital do estado de Mato Grosso.'},
   {id:'G03',category:'geografia',text:'Qual é a capital de Mato Grosso do Sul?',options:['Cuiabá','Campo Grande','Goiânia','Corumbá'],correct:1,fact:'Campo Grande é a capital de Mato Grosso do Sul.'},
@@ -42,10 +53,10 @@ export const questions = [
 ];
 
 export function validateBank(bank=questions){
- if(bank.length!==30)throw new Error('O banco-base deve ter 30 perguntas.');
+ if(bank.length!==40)throw new Error('O banco-base deve ter 40 perguntas.');
  const ids=new Set();
  for(const cat of categories){
-  const required=cat.id==='clima'?10:4;
+  const required=(cat.id==='clima'||cat.id==='biomas_vegetacao')?10:4;
   if(bank.filter(q=>q.category===cat.id).length!==required)throw new Error('Quantidade incorreta no tema '+cat.label);
  }
  for(const q of bank){
@@ -62,7 +73,7 @@ export function shuffle(input,rng=Math.random){
 }
 function withAnswers(q,rng){return {...q,answers:shuffle(q.options.map((text,original)=>({id:q.id+'-'+original,text,correct:original===q.correct})),rng)}}
 export function makeSession(bank=questions,rng=Math.random){
- const cats=[categories[0],...shuffle(categories.slice(1),rng).slice(0,4)];
+ const cats=[categories[0],categories[1],...shuffle(categories.slice(2),rng).slice(0,3)];
  return shuffle(cats.map(cat=>{
   const group=bank.filter(q=>q.category===cat.id);
   if(!group.length)throw new Error('Sem perguntas no tema '+cat.label);
@@ -73,19 +84,32 @@ validateBank();
 export function makeFlexibleSession(bank,rng=Math.random){
  const eligible=bank.filter(q=>q.active!==false&&q.options?.length===4&&q.text?.trim());
  if(eligible.length<5)throw new Error('O banco precisa de pelo menos cinco perguntas ativas.');
- const chosen=[],climate=eligible.filter(q=>isFixedClimateQuestion(q));
- if(climate.length)chosen.push(climate[Math.floor(rng()*climate.length)]);
+ const chosen=[];
+ // Clima e Biomas são dois eixos da Feira Cultural: um de cada por partida.
+ for(const group of [eligible.filter(q=>isFixedClimateQuestion(q)),
+                    eligible.filter(q=>q.category==='biomas_vegetacao')]){
+  if(group.length)chosen.push(group[Math.floor(rng()*group.length)]);
+ }
+ const used=new Set(chosen.map(q=>q.id));
+ const selectedCategories=new Set(chosen.map(q=>q.category).filter(Boolean));
  const groups=new Map();
  for(const q of eligible){
-  if(isFixedClimateQuestion(q))continue;
-  const key=q.topicId||q.category||'sem-topico';
+  if(used.has(q.id)||isFixedClimateQuestion(q))continue;
+  const key=q.category||('topic:'+String(q.topicId||'sem-topico'));
   if(!groups.has(key))groups.set(key,[]);
   groups.get(key).push(q);
  }
  for(const group of shuffle([...groups.values()],rng)){
-  if(chosen.length===5)break;chosen.push(group[Math.floor(rng()*group.length)]);
+  if(chosen.length===5)break;
+  const available=group.filter(q=>!used.has(q.id)&&(!q.category||!selectedCategories.has(q.category)));
+  if(!available.length)continue;
+  const q=available[Math.floor(rng()*available.length)];
+  chosen.push(q);used.add(q.id);if(q.category)selectedCategories.add(q.category);
  }
- const ids=new Set(chosen.map(q=>q.id));
- for(const q of shuffle(eligible.filter(q=>!ids.has(q.id)),rng)){if(chosen.length===5)break;chosen.push(q)}
+ for(const q of shuffle(eligible.filter(q=>!used.has(q.id)),rng)){
+  if(chosen.length===5)break;
+  chosen.push(q);used.add(q.id);
+ }
+ if(chosen.length!==5)throw new Error('Não foi possível selecionar cinco perguntas.');
  return shuffle(chosen.map(q=>withAnswers(q,rng)),rng);
 }
