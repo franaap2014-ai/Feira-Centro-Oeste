@@ -3,9 +3,9 @@ import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {questions,categories,validateBank,makeSession,shuffle} from './questions.js';
 assert.equal(validateBank(),true);
-assert.equal(questions.length,40);
-assert.equal(new Set(questions.map(q=>q.id)).size,40);
-for(const category of categories){assert.equal(questions.filter(q=>q.category===category.id).length,8)}
+assert.equal(questions.length,30);
+assert.equal(new Set(questions.map(q=>q.id)).size,30);
+for(const category of categories){assert.equal(questions.filter(q=>q.category===category.id).length,6)}
 for(const q of questions){assert.equal(q.options.length,4);assert.ok(q.correct>=0&&q.correct<=3);assert.equal(new Set(q.options).size,4)}
 const seen=new Set(); const correctPositions=new Set(); const orders=new Set();
 for(let n=0;n<1200;n++){
@@ -21,9 +21,9 @@ for(let n=0;n<1200;n++){
  }
  orders.add(session.map(q=>q.category).join(','));
 }
-assert.equal(seen.size,40);assert.equal(correctPositions.size,4);assert.ok(orders.size>20);
+assert.equal(seen.size,30);assert.equal(correctPositions.size,4);assert.ok(orders.size>20);
 assert.deepEqual(shuffle([1,2,3,4],()=>0),[2,3,4,1]);
-console.log('✓ 40 questões válidas (8 por tema); 1.200 partidas simuladas; sorteio e respostas aprovados.');
+console.log('✓ 30 questões válidas (6 por tema); 1.200 partidas simuladas; sorteio e respostas aprovados.');
 
 const requiredModules=['app.js','backend.js','music.js','auth-ui.js','admin-music.js','questions.js'];
 const buildSource=readFileSync('build.mjs','utf8');
@@ -112,3 +112,20 @@ assert.ok(neonSource.includes("status:'wrong_account'"));
 assert.ok(buildSource.includes("'neon-google.js'"));
 execFileSync(process.execPath,['--check','neon-google.js'],{stdio:'pipe'});
 console.log('✓ Google Neon verifica identidade antes de liberar criação da senha ADM.');
+
+
+// O Pantanal substitui Brasília no tema e na ilustração inicial.
+assert.equal(categories.length,5);
+assert.equal(categories[4].id,'pantanal');
+assert.equal(categories[4].label,'Pantanal');
+assert.equal(questions.filter(q=>q.category==='pantanal').length,6);
+assert.equal(questions.filter(q=>q.category==='brasilia').length,0);
+assert.ok(readFileSync('index.html','utf8').includes('Paisagem do Pantanal com tuiuiú'));
+assert.ok(!readFileSync('index.html','utf8').includes('Congresso Nacional de Brasília e paisagem'));
+assert.ok(appSource.includes('30 no banco · 5 por partida'));
+for(let i=0;i<1000;i++){
+ const round=makeFlexibleSession(questions);
+ assert.equal(round.length,5);
+ assert.equal(new Set(round.map(q=>q.category)).size,5);
+}
+console.log('✓ Cinco perguntas por partida e Pantanal como quinto tema.');

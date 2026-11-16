@@ -1,10 +1,10 @@
-// Banco de 40 perguntas: 8 por categoria. ID e resposta corretos independem da posição exibida.
+// Banco de 30 perguntas: 6 por tema. O jogo sorteia 5 perguntas por partida.
 export const categories = [
   {id:'geografia', label:'Geografia', icon:'🗺️', subtitle:'Território e natureza'},
   {id:'culinaria', label:'Culinária', icon:'🍲', subtitle:'Sabores da região'},
   {id:'costumes', label:'Costumes', icon:'🎶', subtitle:'Tradições e cultura'},
   {id:'vestimentas', label:'Vestimentas', icon:'👒', subtitle:'Trajes e tradições'},
-  {id:'brasilia', label:'Brasília', icon:'🏛️', subtitle:'Nossa capital'},
+  {id:'pantanal', label:'Pantanal', icon:'🌿', subtitle:'Vida nas áreas alagadas'},
 ];
 // Each correct value is the index in the original options, not a displayed button position.
 export const questions = [
@@ -14,17 +14,13 @@ export const questions = [
   {id:'G04',category:'geografia',text:'Qual é a capital de Goiás?',options:['Anápolis','Goiânia','Brasília','Rio Verde'],correct:1,fact:'Goiânia é a capital de Goiás; Brasília é a capital do Brasil.'},
   {id:'G05',category:'geografia',image:'assets/pantanal.svg',text:'O Pantanal brasileiro ocupa principalmente áreas de quais estados?',options:['Goiás e Tocantins','Goiás e Mato Grosso','Mato Grosso e Mato Grosso do Sul','Minas Gerais e Bahia'],correct:2,fact:'O Pantanal está presente sobretudo em Mato Grosso e Mato Grosso do Sul.'},
   {id:'G06',category:'geografia',image:'assets/cerrado.svg',text:'Observe a ilustração: qual bioma do Centro-Oeste está representado?',options:['Mata Atlântica','Cerrado','Caatinga','Pampa'],correct:1,fact:'O Cerrado ocupa grande parte do Centro-Oeste brasileiro.'},
-  {id:'G07',category:'geografia',text:'Em qual unidade federativa fica a capital do Brasil?',options:['Goiás','Distrito Federal','Mato Grosso','Mato Grosso do Sul'],correct:1,fact:'Brasília fica no Distrito Federal.'},
-  {id:'G08',category:'geografia',text:'Quantas unidades federativas compõem o Centro-Oeste, contando o Distrito Federal?',options:['Três','Cinco','Quatro','Seis'],correct:2,fact:'São três estados e o Distrito Federal, totalizando quatro unidades federativas.'},
 
   {id:'C01',category:'culinaria',image:'assets/pequi.svg',text:'Qual fruto do Cerrado é muito usado no arroz típico de Goiás?',options:['Pequi','Maçã','Morango','Pêssego'],correct:0,fact:'O pequi é um fruto típico do Cerrado, presente em preparações regionais.'},
   {id:'C02',category:'culinaria',text:'O empadão goiano é um prato tradicional de qual estado?',options:['Mato Grosso','Goiás','Acre','Rio Grande do Sul'],correct:1,fact:'O empadão goiano é uma preparação tradicional de Goiás.'},
-  {id:'C03',category:'culinaria',text:'No prato “arroz com pequi”, qual ingrediente dá nome à receita?',options:['Feijão','Carne de sol','Pequi','Milho'],correct:2,fact:'A receita leva arroz e pequi, fruto do Cerrado.'},
   {id:'C04',category:'culinaria',text:'A chipa, popular em Mato Grosso do Sul, é geralmente preparada com...',options:['Polvilho e queijo','Macarrão e tomate','Peixe cru','Batata e chocolate'],correct:0,fact:'A chipa tem tradição na região de fronteira e costuma levar polvilho e queijo.'},
   {id:'C05',category:'culinaria',text:'Apesar do nome, a “sopa paraguaia” tradicional é...',options:['Uma bebida gelada','Um caldo servido em tigela','Um prato assado à base de milho','Uma sobremesa de frutas'],correct:2,fact:'A sopa paraguaia é um prato salgado assado bastante conhecido em Mato Grosso do Sul.'},
   {id:'C06',category:'culinaria',text:'A mojica de pintado é preparada principalmente com qual alimento?',options:['Peixe','Carne de porco','Banana','Frango'],correct:0,fact:'O pintado é um peixe utilizado em receitas tradicionais, inclusive em Mato Grosso.'},
   {id:'C07',category:'culinaria',text:'Qual bebida com erva-mate e água fria é muito popular em Mato Grosso do Sul?',options:['Chocolate quente','Tereré','Café com leite','Suco de caju'],correct:1,fact:'O tereré é tradicionalmente preparado com erva-mate e água fria.'},
-  {id:'C08',category:'culinaria',text:'A guariroba, encontrada em receitas goianas, é um tipo de...',options:['Queijo','Peixe','Palmito','Cereal'],correct:2,fact:'A guariroba é uma palmeira cujo palmito de sabor amargo integra pratos regionais.'},
 
   {id:'T01',category:'costumes',text:'A catira é uma manifestação cultural marcada principalmente por...',options:['Sapateado e palmas','Dança com leques','Roda de capoeira','Música instrumental sem dança'],correct:0,fact:'A catira usa movimentos dos pés e palmas, frequentemente ao som da viola.'},
   {id:'T02',category:'costumes',text:'Qual instrumento é muito associado à música caipira e à catira?',options:['Harpa celta','Viola caipira','Gaita de foles','Saxofone'],correct:1,fact:'A viola caipira acompanha muitas manifestações musicais da região.'},
@@ -32,8 +28,6 @@ export const questions = [
   {id:'T04',category:'costumes',text:'Compartilhar uma roda de tereré é um costume muito presente em...',options:['Mato Grosso do Sul','Pará','Maranhão','Pernambuco'],correct:0,fact:'O tereré integra o convívio social em Mato Grosso do Sul.'},
   {id:'T05',category:'costumes',text:'O siriri é conhecido como uma expressão tradicional de...',options:['Dança e música','Arquitetura moderna','Escalada esportiva','Cinema mudo'],correct:0,fact:'O siriri é uma manifestação de dança e música popular em Mato Grosso.'},
   {id:'T06',category:'costumes',text:'O cururu, presente em tradições de Mato Grosso, está relacionado a...',options:['Canto e música popular','Corrida de automóveis','Mergulho no mar','Pintura digital'],correct:0,fact:'O cururu é uma manifestação musical tradicional, com cantoria.'},
-  {id:'T07',category:'costumes',text:'A Folia de Reis, celebrada em partes do Centro-Oeste, está ligada a...',options:['Uma tradição popular religiosa','Um festival gastronômico','Uma competição de rodeio','Uma festa de colheita'],correct:0,fact:'A Folia de Reis é uma tradição popular religiosa presente em várias regiões do Brasil.'},
-  {id:'T08',category:'costumes',text:'No Pantanal, o modo de vida tradicional de muitos trabalhadores rurais está ligado a...',options:['Criação de gado','Mineração de sal-gema','Cultivo de trigo em estufas','Pesca em mar aberto'],correct:0,fact:'A pecuária faz parte da história e da cultura pantaneira.'},
 
   {id:'V01',category:'vestimentas',image:'assets/pantaneiro.svg',text:'Qual acessório ajuda a proteger do sol os trabalhadores rurais do Pantanal?',options:['Chapéu de abas largas','Chapéu de festa junina de palha fina','Boné de ciclista','Capuz de tecido leve'],correct:0,fact:'Chapéus de abas largas são úteis no trabalho ao ar livre no Pantanal.'},
   {id:'V02',category:'vestimentas',text:'Em atividades rurais pantaneiras, as botas são usadas principalmente para...',options:['Proteger os pés','Ajudar na navegação','Identificar a região de origem','Substituir as esporas'],correct:0,fact:'As botas oferecem proteção aos pés durante as atividades no campo.'},
@@ -41,23 +35,19 @@ export const questions = [
   {id:'V04',category:'vestimentas',text:'Nas Cavalhadas de Pirenópolis, os participantes a cavalo usam...',options:['Trajes elaborados que representam cavaleiros','Trajes típicos de dança de salão','Roupas de pescadores','Uniformes de bandas marciais'],correct:0,fact:'As Cavalhadas apresentam cavaleiros com trajes cerimoniais e ornamentados.'},
   {id:'V05',category:'vestimentas',text:'Nas quadrilhas de festas juninas da região, é comum ver...',options:['Vestidos rodados e trajes caipiras','Trajes de capoeira','Uniformes de futebol','Roupas de formatura'],correct:0,fact:'As quadrilhas juninas usam figurinos festivos de inspiração caipira em várias regiões.'},
   {id:'V06',category:'vestimentas',text:'Em apresentações tradicionais de siriri, um elemento frequente do figurino feminino é...',options:['Saia rodada e colorida','Saia de couro rígido','Uniforme escolar','Vestimenta de trabalho industrial'],correct:0,fact:'O figurino do siriri frequentemente usa saias rodadas e cores vivas.'},
-  {id:'V07',category:'vestimentas',text:'Qual material aparece historicamente em peças resistentes usadas no trabalho rural?',options:['Couro','Seda fina','Papel decorado','Linho transparente'],correct:0,fact:'O couro foi usado em diferentes itens e acessórios de trabalho rural.'},
-  {id:'V08',category:'vestimentas',text:'Sobre os trajes tradicionais do Centro-Oeste, qual afirmação está correta?',options:['Variam de acordo com a tradição e a comunidade','Todos os moradores usam a mesma roupa típica','Existe apenas um traje oficial para toda a região','Todas as roupas típicas são feitas de seda'],correct:0,fact:'A região apresenta muitas culturas e tradições, sem um único traje para todos.'},
 
-  {id:'B01',category:'brasilia',image:'assets/congresso.svg',text:'Em que ano Brasília foi inaugurada como capital do Brasil?',options:['1889','1960','2000','1822'],correct:1,fact:'Brasília foi inaugurada em 21 de abril de 1960.'},
-  {id:'B02',category:'brasilia',text:'Quem projetou importantes edifícios modernistas de Brasília?',options:['Oscar Niemeyer','Aleijadinho','Machado de Assis','Cândido Portinari'],correct:0,fact:'Oscar Niemeyer projetou importantes edifícios públicos da capital.'},
-  {id:'B03',category:'brasilia',text:'Quem elaborou o Plano Piloto de Brasília?',options:['Lúcio Costa','Santos Dumont','Tarsila do Amaral','Monteiro Lobato'],correct:0,fact:'O urbanista Lúcio Costa foi o autor do Plano Piloto vencedor do concurso.'},
-  {id:'B04',category:'brasilia',text:'Qual poder da República tem sua sede no Congresso Nacional?',options:['Poder Legislativo','Poder Judiciário apenas','Poder Executivo apenas','Poder Moderador'],correct:0,fact:'O Congresso Nacional abriga a Câmara dos Deputados e o Senado Federal.'},
-  {id:'B05',category:'brasilia',text:'Qual edifício de Brasília é conhecido por sua estrutura de colunas curvas que se elevam?',options:['Catedral Metropolitana de Brasília','Teatro Amazonas','Museu do Ipiranga','Elevador Lacerda'],correct:0,fact:'A Catedral de Brasília é uma obra famosa pela estrutura moderna.'},
-  {id:'B06',category:'brasilia',text:'O Palácio do Planalto é associado principalmente a qual função?',options:['Sede de trabalho da Presidência da República','Estação ferroviária','Museu de astronomia','Estádio de futebol'],correct:0,fact:'O Palácio do Planalto é sede de trabalho da Presidência da República.'},
-  {id:'B07',category:'brasilia',text:'Brasília fica em qual unidade federativa?',options:['Distrito Federal','Estado do Rio de Janeiro','Estado de São Paulo','Estado do Pará'],correct:0,fact:'A capital brasileira está localizada no Distrito Federal.'},
-  {id:'B08',category:'brasilia',text:'Qual presidente esteve à frente da construção e inauguração de Brasília?',options:['Juscelino Kubitschek','Dom Pedro II','Getúlio Vargas em 1930','Deodoro da Fonseca'],correct:0,fact:'Juscelino Kubitschek era presidente durante a construção e inauguração de Brasília.'},
+  {id:'P01',category:'pantanal',image:'assets/pantanal.svg',text:'Qual característica natural torna o Pantanal tão especial?',options:['É um deserto sem rios','Possui planícies que alagam em parte do ano','É coberto por neve no inverno','É formado apenas por montanhas altas'],correct:1,fact:'O Pantanal é uma extensa planície com ciclos naturais de cheia e seca.'},
+  {id:'P02',category:'pantanal',text:'Qual felino é encontrado no Pantanal e é importante para o equilíbrio da fauna?',options:['Onça-pintada','Leopardo-das-neves','Tigre-de-bengala','Leão-africano'],correct:0,fact:'A onça-pintada é um grande predador nativo do Pantanal e ajuda a manter o equilíbrio ecológico.'},
+  {id:'P03',category:'pantanal',text:'Qual dessas aves pode ser encontrada no Pantanal e se destaca pela plumagem azul?',options:['Pinguim-imperador','Arara-azul','Avestruz','Gaivota-ártica'],correct:1,fact:'A arara-azul-grande é uma ave marcante da fauna pantaneira.'},
+  {id:'P04',category:'pantanal',text:'Qual rio é fundamental para o sistema de águas do Pantanal?',options:['Rio Tietê','Rio São Francisco','Rio Paraguai','Rio Doce'],correct:2,fact:'O rio Paraguai e seus afluentes são essenciais para o ciclo de cheias da planície pantaneira.'},
+  {id:'P05',category:'pantanal',text:'Por que áreas do Pantanal ficam inundadas durante parte do ano?',options:['Por causa das marés do Oceano Atlântico','Pelo aumento das águas na época das chuvas','Porque o solo é formado por gelo','Porque a região não possui árvores'],correct:1,fact:'As chuvas e os rios elevam o nível da água e provocam inundações sazonais.'},
+  {id:'P06',category:'pantanal',text:'Por que é importante proteger o Pantanal?',options:['Para eliminar todas as plantas da região','Para transformar as áreas alagadas em deserto','Para preservar sua biodiversidade e os recursos hídricos','Para impedir a existência de rios'],correct:2,fact:'A conservação do Pantanal protege espécies, habitats e as águas fundamentais para a região.'},
 ];
 
 export function validateBank(bank = questions) {
-  if (bank.length !== 40) throw new Error('Banco deve ter exatamente 40 questões');
+  if (bank.length !== 30) throw new Error('Banco deve ter exatamente 30 questões');
   const ids = new Set();
-  for (const cat of categories) if (bank.filter(q => q.category === cat.id).length !== 8) throw new Error(`Categoria ${cat.id} deve ter 8 perguntas`);
+  for (const cat of categories) if (bank.filter(q => q.category === cat.id).length !== 6) throw new Error(`Categoria ${cat.id} deve ter 6 perguntas`);
   for (const q of bank) {
     if (ids.has(q.id)) throw new Error(`ID duplicado: ${q.id}`);
     ids.add(q.id);
@@ -93,7 +83,7 @@ export function makeFlexibleSession(bank,rng=Math.random){
  if(eligible.length<5)throw new Error('O banco precisa de pelo menos cinco perguntas ativas.');
  const groups=new Map();
  for(const q of eligible){
-  const key=q.topicId||'sem-topico';
+  const key=q.topicId||q.category||'sem-topico';
   if(!groups.has(key))groups.set(key,[]);
   groups.get(key).push(q);
  }

@@ -82,17 +82,48 @@
  </form>
 </dialog>
 <template id="illustration">
-<svg class="hero-landscape" viewBox="0 0 680 465" role="img" aria-label="Ilustração estilizada do Congresso Nacional de Brasília e paisagem do Cerrado">
-<defs><linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE5ED"/><stop offset="1" stop-color="#FAD6CF"/></linearGradient><linearGradient id="pinkHill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EC7FA1"/><stop offset="1" stop-color="#B44973"/></linearGradient><linearGradient id="gold" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#F3D7A4"/><stop offset="1" stop-color="#D39B60"/></linearGradient></defs>
-<circle cx="342" cy="225" r="198" fill="url(#sky)"/><circle cx="476" cy="105" r="43" fill="#F9BE9D" opacity=".8"/>
-<g stroke="#DC8CAA" stroke-width="2" opacity=".72" fill="none"><path d="M113 129l9-11 10 11"/><path d="M526 182l10-12 10 12"/><path d="M475 71l5-5 5 5"/></g>
-<path d="M78 328Q158 270 260 327T457 306T614 334V435H78Z" fill="#F5BDB8"/><path d="M36 376Q155 305 260 369T472 347T647 367V448H36Z" fill="url(#pinkHill)"/><path d="M64 429Q211 380 332 425T626 398V464H64Z" fill="#843855"/>
-<!-- Stylized Congresso Nacional: twin towers and opposing domes -->
-<g transform="translate(194 131)"><ellipse cx="144" cy="221" rx="172" ry="18" fill="#893E5A" opacity=".14"/><path d="M-2 212H303V239H-2Z" fill="#D8B3B9"/><rect x="117" y="12" width="37" height="204" rx="3" fill="#FFF9F6"/><rect x="165" y="12" width="37" height="204" rx="3" fill="#F8EBE8"/><path d="M127 19v189M175 19v189" stroke="#E5D4D0" stroke-width="3"/><path d="M-5 202Q34 144 76 202Z" fill="#FFF7F3" stroke="#D6AEB7" stroke-width="3"/><path d="M226 171Q268 225 307 171Z" fill="#FFF7F3" stroke="#D6AEB7" stroke-width="3"/><path d="M-14 217H313" stroke="#FDF5F1" stroke-width="7" stroke-linecap="round"/></g>
-<!-- stylized cerrado trees -->
-<g fill="none" stroke="#5D5445" stroke-linecap="round"><path d="M123 405v-53l-18-21M123 368l20-25M539 409v-64l-23-17M539 372l23-31" stroke-width="6"/></g><path d="M83 333Q83 297 118 308Q139 275 169 301Q199 310 178 342Q160 354 133 346Q98 359 83 333" fill="#967D65"/><path d="M487 327Q481 291 521 297Q539 271 567 290Q607 304 580 338Q556 350 526 340Q499 351 487 327" fill="#8A755B"/>
-<g fill="#F4C97E"><path d="M168 416q10-20 19 0t20 0"/><path d="M480 431q11-16 20 0t19 0"/></g>
-<g fill="#FFFFFF" opacity=".86"><circle cx="94" cy="197" r="4"/><circle cx="569" cy="260" r="3"/><circle cx="427" cy="66" r="3"/><circle cx="155" cy="88" r="3"/></g>
+<svg class="hero-landscape" viewBox="0 0 680 465" role="img" aria-label="Paisagem do Pantanal com tuiuiú, capivara, rio e vegetação">
+<defs>
+ <linearGradient id="pantSky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE7EF"/><stop offset="1" stop-color="#FCE0CB"/></linearGradient>
+ <linearGradient id="pantWater" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ADDAD0"/><stop offset="1" stop-color="#68A5AA"/></linearGradient>
+ <linearGradient id="pantLand" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EABCB3"/><stop offset="1" stop-color="#B65A83"/></linearGradient>
+</defs>
+<circle cx="342" cy="225" r="198" fill="url(#pantSky)"/>
+<circle cx="485" cy="109" r="42" fill="#F4BE92" opacity=".88"/>
+<g fill="none" stroke="#DD8CA8" stroke-width="2.5" stroke-linecap="round"><path d="M113 128l10-11 10 11M522 168l10-12 10 12M474 64l6-5 6 5"/></g>
+<path d="M78 315Q158 280 260 312T458 298T617 322V428H78Z" fill="#DAC5A9"/>
+<path d="M53 349Q155 310 260 350T473 336T636 356V441H53Z" fill="#9DB69C"/>
+<path d="M59 368Q163 346 267 369T476 351T623 373V451H59Z" fill="url(#pantWater)"/>
+<path d="M81 397Q172 376 275 397T489 386T608 403" stroke="#F2F9EF" fill="none" stroke-width="6" opacity=".75"/>
+<path d="M55 428Q165 401 281 427T487 417T635 430V465H55Z" fill="url(#pantLand)"/>
+<!-- Árvores nas margens -->
+<g stroke="#746565" stroke-width="7" fill="none" stroke-linecap="round"><path d="M133 354v-98m0 38-35-25m35 11 32-35M537 364V258m0 38-34-29m34 9 32-34"/></g>
+<g fill="#899E81"><ellipse cx="113" cy="251" rx="64" ry="25"/><ellipse cx="155" cy="243" rx="49" ry="26"/><ellipse cx="517" cy="248" rx="66" ry="28"/><ellipse cx="561" cy="245" rx="46" ry="22"/></g>
+<g stroke="#799681" fill="none" stroke-width="4" stroke-linecap="round"><path d="M86 413l-12-53m12 35 14-29m20 45-5-45m5 27 16-33M553 414l10-53m-8 34-13-29m34 44 8-52m-12 35 20-31"/></g>
+<!-- Tuiuiú, ave típica do Pantanal -->
+<g transform="translate(275 134)">
+ <path d="M68 176l-8 112M98 177l8 111" stroke="#5F5862" fill="none" stroke-width="5" stroke-linecap="round"/>
+ <path d="M47 289h27M95 288h22" stroke="#5F5862" stroke-width="4" stroke-linecap="round"/>
+ <ellipse cx="86" cy="149" rx="66" ry="50" fill="#FFF9F4" stroke="#D9C3BD" stroke-width="3"/>
+ <path d="M46 143Q87 168 129 147Q112 188 72 186Z" fill="#E9DDD7"/>
+ <path d="M109 113Q128 84 124 51Q124 34 137 30Q145 31 151 43Q132 82 135 117" fill="#4D4E5A"/>
+ <path d="M124 80l16-2-4 18-14-3Z" fill="#D95F72"/>
+ <ellipse cx="143" cy="36" rx="18" ry="16" fill="#4D4E5A"/>
+ <path d="M157 34l80 14-81 3Z" fill="#D7AB76" stroke="#B8896C" stroke-width="2"/>
+ <circle cx="148" cy="30" r="3" fill="#FFFFFF"/>
+</g>
+<!-- Capivara perto da água -->
+<g transform="translate(145 350)">
+ <ellipse cx="65" cy="40" rx="69" ry="35" fill="#AC806D"/>
+ <ellipse cx="115" cy="22" rx="30" ry="26" fill="#B78D72"/>
+ <ellipse cx="108" cy="0" rx="9" ry="10" fill="#956D5C"/>
+ <circle cx="120" cy="19" r="3.4" fill="#594648"/>
+ <ellipse cx="138" cy="26" rx="6" ry="4" fill="#6B5250"/>
+ <path d="M31 69v8m45-9v9" stroke="#8C665B" stroke-width="7" stroke-linecap="round"/>
+</g>
+<g fill="none" stroke="#F3F9F1" stroke-width="3" stroke-linecap="round" opacity=".85"><path d="M370 402h30m29 13h47M102 384h24M500 386h23"/></g>
+<g stroke="#AE7A8C" stroke-width="3" stroke-linecap="round" fill="none"><path d="M201 175q13-15 25 0q12-15 24 0M463 203q11-13 23 0q11-13 22 0"/></g>
+<g fill="#FFFFFF" opacity=".85"><circle cx="96" cy="195" r="4"/><circle cx="570" cy="273" r="3"/><circle cx="410" cy="71" r="3"/></g>
 </svg>
 </template>
 </body>

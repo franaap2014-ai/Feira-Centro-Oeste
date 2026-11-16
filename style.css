@@ -136,3 +136,9 @@ main{flex:1;display:flex;flex-direction:column}.footer{margin-top:auto;display:f
 #verifyAdminGoogle:disabled{opacity:.65;cursor:wait}
 #googleVerifyStatus{display:block;line-height:1.55;font-weight:600}
 #admCreatePassword:disabled,#admCreateConfirm:disabled{background:#f7f1f5;color:#9d8c95;cursor:not-allowed}
+
+
+/* Temas em destaque na tela inicial: 30 questões / 5 desafios */
+.home-themes{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-14px 0 30px;max-width:530px}
+.home-theme{display:inline-flex;align-items:center;white-space:nowrap;border:1px solid #ead0dc;background:#fff8fb;color:#995573;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:800}
+@media(max-width:590px){.home-themes{gap:7px;margin:-8px 0 24px}.home-theme{font-size:10px;padding:6px 9px}}
