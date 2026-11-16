@@ -23,7 +23,7 @@ export async function signIn(email,password){
 export async function getValidToken(){
  if(!session)return null;
  if(Date.now()<session.expires_at-60000)return session.access_token;
- try{const data=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});session={access_token:data.access_token,refresh_token:data.refresh_token,expires_at:Date.now()+data.expires_in*1000,user:data.user};localStorage.setItem(AUTH_KEY,JSON.stringify(session));return session.access_token}catch{signOut();return null}
+ try{const data=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});session={access_token:data.access_token,refresh_token:data.refresh_token,expires_at:Date.now()+data.expires_in*1000,user:data.user};localStorage.setItem(AUTH_KEY,JSON.stringify(session));return session.access_token}catch(error){if(/invalid.*refresh|refresh.*not.*found|invalid.grant|HTTP 400|HTTP 401/i.test(String(error?.message||'')))signOut();return null}
 }
 export function signOut(){session=null;localStorage.removeItem(AUTH_KEY)}
 export async function getRole(){const token=await getValidToken();if(!token)return null;const rows=await request(`/rest/v1/quiz_roles?select=role&user_id=eq.${encodeURIComponent(session.user.id)}&limit=1`,{token});return rows?.[0]?.role??null}

@@ -29,7 +29,7 @@ function draw(){
  status.textContent='';
  if(active&&mode==='account'){
   title.textContent='Minha conta';
-  controls.innerHTML='<p class="guest-welcome">Você está conectado como <strong>'+escapeHTML(active.username)+'</strong>.</p>';
+  controls.innerHTML='<p class="guest-welcome">Você está conectado como <strong>'+escapeHTML(active.username)+'</strong>.</p>'+ '<p class="guest-persist-note">Sua conta continua conectada neste aparelho. Use “Sair da conta” para desconectar.</p>';
   submit.hidden=true;
   actions.innerHTML='<button type="button" id="guestPlay" class="button button-primary full">Jogar agora ↗</button>'+
   '<button type="button" id="guestLogout" class="guest-text-action">Sair da conta</button>'+
@@ -51,7 +51,7 @@ function draw(){
  actions.innerHTML='<button type="button" id="guestSwitch" class="guest-text-action">'+
  (creating?'Já tem uma conta? <strong>Entre</strong>':'Não tem conta? <strong>Criar conta</strong>')+'</button>'+
  '<button type="button" id="guestAdmin" class="guest-text-action guest-admin-action">Acesso de ADM</button>'+
- '<small>Cadastro sem e-mail. Guarde sua senha para entrar novamente.</small>';
+ '<small>Cadastro sem e-mail. Você permanece conectado neste aparelho por até 90 dias sem atividade.</small>';
  document.getElementById('guestSwitch').onclick=()=>{mode=creating?'login':'create';draw();document.getElementById('guestUsername').focus()};
  document.getElementById('guestAdmin').onclick=()=>{dialog.close();adminAccess()};
  document.getElementById('guestUsername').focus();

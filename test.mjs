@@ -155,3 +155,11 @@ assert.deepEqual((()=>{const q=questions.find(x=>x.id==='CL10');return [q.text,q
 assert.ok(readFileSync('backend.js','utf8').includes('if(isFixedClimateQuestion(q))return'));
 assert.ok(readFileSync('studio.js','utf8').includes('studio-locked'));
 console.log('✓ Dez perguntas de Clima são fixas e têm gabaritos iguais aos fornecidos.');
+
+const authBackend=readFileSync('backend.js','utf8');
+assert.ok(authBackend.includes("if(/invalid.*refresh"),'Falhas temporárias não devem desconectar o ADM');
+const guestSessions=readFileSync('guest.js','utf8');
+assert.ok(guestSessions.includes('localStorage.setItem(STORAGE_KEY'));
+assert.ok(guestSessions.includes('90 dias sem atividade'));
+assert.ok(appSource.includes('mantendo a sessão local'));
+console.log('✓ Sessões permanecem salvas no aparelho e não são apagadas por falhas temporárias.');
