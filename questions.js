@@ -6,7 +6,7 @@ export const TOURISM_RESERVED_IDS=Object.freeze(Array.from({length:10},(_,i)=>'P
 export const categories=[
  {id:'clima',label:'Clima',icon:'🌦️',subtitle:'Clima e estações'},
  {id:'biomas_vegetacao',label:'Biomas e Vegetação',icon:'🌳',subtitle:'Cerrado, Pantanal e flora'},
- {id:'pontos_turisticos',label:'Pontos Turísticos',icon:'📍',subtitle:'Destinos e atrações do Centro-Oeste'}
+ {id:'pontos_turisticos',label:'Pontos Turísticos',icon:'📍',subtitle:'Chapada dos Veadeiros, Brasília e turismo regional'}
 ];
 export const isOfficialQuestion=value=>/^(?:CL|BV|PT)(?:0[1-9]|10)$/.test(typeof value==='string'?value:String(value?.id||''));
 export const isFixedClimateQuestion=value=>/^CL(?:0[1-9]|10)$/.test(typeof value==='string'?value:String(value?.id||''));
@@ -31,16 +31,16 @@ export const questions=Object.freeze([
  {id:'BV08',category:'biomas_vegetacao',text:"Qual é uma ameaça à vegetação do Centro-Oeste?",options:["Desmatamento","Nevascas","Terremotos","Geleiras"],correct:0,fact:'',fixed:true},
  {id:'BV09',category:'biomas_vegetacao',text:"Qual estado brasileiro possui grande parte do Pantanal?",options:["São Paulo","Mato Grosso do Sul","Paraná","Rio de Janeiro"],correct:1,fact:'',fixed:true},
  {id:'BV10',category:'biomas_vegetacao',text:"Por que a vegetação do Centro-Oeste é importante?",options:["Porque não possui animais","Porque serve apenas para decoração","Porque abriga animais e mantém o equilíbrio ambiental","Porque impede todas as chuvas"],correct:2,fact:'',fixed:true},
- {id:'PT01',category:'pontos_turisticos',text:"Qual parque nacional de Goiás é famoso por suas trilhas e cachoeiras?",options:["Chapada dos Guimarães","Serra da Bodoquena","Chapada dos Veadeiros","Parque Nacional de Brasília"],correct:2,fact:'',fixed:true},
- {id:'PT02',category:'pontos_turisticos',text:"Qual cidade de Goiás é conhecida por suas águas termais?",options:["Corumbá","Caldas Novas","Pirenópolis","Bonito"],correct:1,fact:'',fixed:true},
- {id:'PT03',category:'pontos_turisticos',text:"Qual cidade de Goiás é famosa por suas ruas de pedra, casarões coloniais e cachoeiras?",options:["Pirenópolis","Goiânia","Trindade","Rio Verde"],correct:0,fact:'',fixed:true},
- {id:'PT04',category:'pontos_turisticos',text:"Qual parque nacional de Mato Grosso é conhecido por seus paredões rochosos e pela Cachoeira Véu de Noiva?",options:["Chapada dos Veadeiros","Parque Nacional de Brasília","Serra da Canastra","Chapada dos Guimarães"],correct:3,fact:'',fixed:true},
- {id:'PT05',category:'pontos_turisticos',text:"Qual atividade turística é famosa na região de Nobres, em Mato Grosso?",options:["Esquiar em montanhas nevadas","Surfar em praias oceânicas","Flutuar em rios de águas cristalinas","Visitar geleiras"],correct:2,fact:'',fixed:true},
- {id:'PT06',category:'pontos_turisticos',text:"Qual cidade de Mato Grosso do Sul é famosa por seus rios cristalinos e passeios de flutuação?",options:["Bonito","Corumbá","Campo Grande","Três Lagoas"],correct:0,fact:'',fixed:true},
- {id:'PT07',category:'pontos_turisticos',text:"Em qual cidade fica a famosa Gruta do Lago Azul, que possui um lago de águas azuladas dentro de uma caverna?",options:["Brasília","Bonito","Cuiabá","Caldas Novas"],correct:1,fact:'',fixed:true},
- {id:'PT08',category:'pontos_turisticos',text:"Qual cidade de Mato Grosso do Sul, localizada às margens do Rio Paraguai, é uma das principais portas de entrada para o turismo no Pantanal?",options:["Goiânia","Pirenópolis","Nobres","Corumbá"],correct:3,fact:'',fixed:true},
- {id:'PT09',category:'pontos_turisticos',text:"Qual ponto turístico de Brasília é conhecido por suas colunas curvas e seus belos vitrais?",options:["Catedral Metropolitana","Memorial JK","Torre de TV","Congresso Nacional"],correct:0,fact:'',fixed:true},
- {id:'PT10',category:'pontos_turisticos',text:"Qual praça de Brasília reúne o Palácio do Planalto, o Congresso Nacional e o Supremo Tribunal Federal?",options:["Praça da Liberdade","Praça dos Cristais","Praça dos Três Poderes","Praça da Sé"],correct:2,fact:'',fixed:true},
+ {id:'PT01',category:'pontos_turisticos',text:"Qual estado brasileiro abriga a Chapada dos Veadeiros?",options:["Mato Grosso","Goiás","Minas Gerais","São Paulo"],correct:1,fact:'',fixed:true},
+ {id:'PT02',category:'pontos_turisticos',text:"O que os turistas encontram na Chapada dos Veadeiros?",options:["Praias de mar","Montanhas com neve","Cachoeiras e trilhas","Grandes geleiras"],correct:2,fact:'',fixed:true},
+ {id:'PT03',category:'pontos_turisticos',text:"Qual é o bioma do Parque Nacional da Chapada dos Veadeiros?",options:["Pampa","Caatinga","Cerrado","Mata Atlântica"],correct:2,fact:'',fixed:true},
+ {id:'PT04',category:'pontos_turisticos',text:"Qual cidade é uma das principais bases para visitar a Chapada dos Veadeiros?",options:["Curitiba","Alto Paraíso de Goiás","Recife","São Paulo"],correct:1,fact:'',fixed:true},
+ {id:'PT05',category:'pontos_turisticos',text:"Qual atração da Chapada dos Veadeiros tem rochas que lembram a superfície da Lua?",options:["Vale da Lua","Praia das Conchas","Serra de Gelo","Lago das Estrelas"],correct:0,fact:'',fixed:true},
+ {id:'PT06',category:'pontos_turisticos',text:"Qual é a capital do Brasil?",options:["Brasília","Goiânia","Rio de Janeiro","Salvador"],correct:0,fact:'',fixed:true},
+ {id:'PT07',category:'pontos_turisticos',text:"Brasília fica em qual unidade federativa?",options:["Distrito Federal","Goiás","Mato Grosso","Mato Grosso do Sul"],correct:0,fact:'',fixed:true},
+ {id:'PT08',category:'pontos_turisticos',text:"Qual destes pontos turísticos fica em Brasília?",options:["Torre Eiffel","Coliseu","Congresso Nacional","Torre de Pisa"],correct:2,fact:'',fixed:true},
+ {id:'PT09',category:'pontos_turisticos',text:"Em qual região brasileira ficam a Chapada dos Veadeiros e Brasília?",options:["Nordeste","Centro-Oeste","Sul","Norte"],correct:1,fact:'',fixed:true},
+ {id:'PT10',category:'pontos_turisticos',text:"Ao visitar um parque natural como a Chapada dos Veadeiros, qual atitude ajuda a preservar o lugar?",options:["Deixar lixo nas trilhas","Arrancar plantas do caminho","Recolher o lixo e respeitar as trilhas","Alimentar os animais silvestres"],correct:2,fact:'',fixed:true},
 ].map(q=>Object.freeze({...q,options:Object.freeze([...q.options])})));
 
 export function validateBank(bank=questions){
