@@ -25,17 +25,6 @@ function svgArt(){return document.getElementById('illustration').innerHTML}
 function home(){
  state.page='home';setNav();
  const visitor=getVisitor();
- const region=[
-  {id:'cerrado',name:'O Cerrado',subtitle:'BIOMA',description:'Árvores de troncos retorcidos, raízes profundas e paisagens de resistência.',image:'assets/cerrado.svg'},
-  {id:'pantanal',name:'O Pantanal',subtitle:'NATUREZA',description:'Planícies alagadas e vida selvagem nas margens dos rios.',image:'assets/pantanal.svg'},
-  {id:'festas',name:'Nossa cultura',subtitle:'TRADIÇÃO',description:'Cavalhadas, catira, siriri e cururu: ritmos e histórias da região.',image:'assets/cavalhadas.svg'},
-  {id:'sabores',name:'Nossos sabores',subtitle:'CULINÁRIA',description:'Pequi, empadão goiano, chipa e tereré fazem parte dessa viagem.',image:'assets/pequi.svg'}
- ];
- const regionCards=region.map((r,i)=>`<article class="atlas-scene atlas-scene-${r.id}"><img src="${r.image}" alt="Ilustração de ${escapeHTML(r.name)}" loading="lazy" width="230" height="154"><div><small>${String(i+1).padStart(2,'0')} / ${r.subtitle}</small><h3>${escapeHTML(r.name)}</h3><p>${escapeHTML(r.description)}</p></div></article>`).join('');
- const themeCards=categories.map((c,i)=>{
-  const count=questions.filter(q=>q.category===c.id).length;
-  return `<article class="atlas-topic"><div class="atlas-topic-top"><span class="atlas-topic-icon">${escapeHTML(c.icon)}</span><span class="atlas-topic-num">${String(i+1).padStart(2,'0')}</span></div><h3>${escapeHTML(c.label)}</h3><p>${escapeHTML(c.subtitle)}</p><span class="atlas-topic-count">${count+' perguntas · fixas 🔒'}</span></article>`;
- }).join('');
  root.innerHTML=`
  <div class="atlas-home" id="inicio">
   <section class="atlas-hero" aria-labelledby="atlas-title">
@@ -58,29 +47,15 @@ function home(){
    </div>
   </section>
   <p class="atlas-photo-credit">Foto: <a href="https://commons.wikimedia.org/wiki/File:Pantanal,_Mato_Grosso,_Brasil.jpg" target="_blank" rel="noopener noreferrer">Filipefrazao / Wikimedia Commons, CC BY-SA 3.0</a>.</p>
-  <section class="atlas-metrics" aria-label="Informações do jogo">
-   <div><b>30</b><span>perguntas oficiais</span></div>
-   <div><b>03</b><span>temas completos</span></div>
-   <div><b>05</b><span>por partida</span></div>
-   <div><b>🔒</b><span>banco fechado</span></div>
-  </section>
-  <section class="atlas-explore" aria-labelledby="atlas-explore-title">
-   <div class="atlas-section-head"><div><span>01 · DESCUBRA A REGIÃO</span><h2 id="atlas-explore-title">Entre rios, <em>sabores e tradições.</em></h2></div><p>A cultura do Centro-Oeste nasce de sua natureza, de seus povos e de suas paisagens.</p></div>
-   <div class="atlas-scenes">${regionCards}</div>
-  </section>
-  <section class="atlas-themes" id="temas" aria-labelledby="atlas-themes-title">
-   <div class="atlas-section-head"><div><span>02 · O CONHECIMENTO É A VIAGEM</span><h2 id="atlas-themes-title">Três temas, <em>30 descobertas.</em></h2></div><p>Os três temas estão completos: 10 perguntas fixas em cada um.</p></div>
-   <div class="atlas-topic-grid">${themeCards}</div>
-  </section>
   <section class="atlas-how" id="como-jogar" aria-labelledby="atlas-how-title">
-   <div class="atlas-how-main"><span>03 · SUA VEZ DE PARTICIPAR</span><h2 id="atlas-how-title">Preparado para <em>essa viagem?</em></h2><p>Descubra o Centro-Oeste em um quiz com cinco perguntas por partida.</p><button class="atlas-cta" id="startBottomBtn" type="button">Quero jogar <span aria-hidden="true">↗</span></button></div>
+   <div class="atlas-how-main"><span>01 · SUA VEZ DE PARTICIPAR</span><h2 id="atlas-how-title">Preparado para <em>essa viagem?</em></h2><p>Descubra o Centro-Oeste em um quiz com cinco perguntas por partida.</p><button class="atlas-cta" id="startBottomBtn" type="button">Quero jogar <span aria-hidden="true">↗</span></button></div>
    <div class="atlas-how-steps">
     <div><b>01</b><span><strong>Entre uma vez</strong><small>O site mantém sua conta conectada neste aparelho.</small></span></div>
-    <div><b>02</b><span><strong>Responda cinco perguntas</strong><small>Uma de cada tema e mais duas perguntas sorteadas entre as 30.</small></span></div>
+    <div><b>02</b><span><strong>Responda cinco perguntas</strong><small>Uma pergunta de cada tema e outras duas sorteadas entre as restantes.</small></span></div>
     <div><b>03</b><span><strong>Veja seu resultado</strong><small>Confira seus acertos e experimente outra rodada.</small></span></div>
    </div>
   </section>
-  <p class="atlas-endline">✺ 30 PERGUNTAS OFICIAIS · 3 TEMAS · 7º B</p>
+  <p class="atlas-endline">✺ FEIRA CULTURAL CSA 2026 · CENTRO-OESTE · 7º B</p>
  </div>`;
  document.getElementById('startBtn').onclick=start;
  document.getElementById('startBottomBtn').onclick=start;

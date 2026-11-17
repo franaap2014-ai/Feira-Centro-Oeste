@@ -122,7 +122,7 @@ assert.equal(questions.filter(q=>q.category==='pontos_turisticos').length,10);
 assert.equal(questions.filter(q=>q.category==='brasilia').length,0);
 assert.ok(readFileSync('index.html','utf8').includes('Paisagem do Pantanal com tuiuiú'));
 assert.ok(!readFileSync('index.html','utf8').includes('Congresso Nacional de Brasília e paisagem'));
-assert.ok(appSource.includes('perguntas oficiais'));
+assert.ok(appSource.includes('01 · SUA VEZ DE PARTICIPAR'));
 for(let i=0;i<1000;i++){
  const round=makeFlexibleSession(questions);
  assert.equal(round.length,5);
@@ -136,7 +136,7 @@ assert.ok(appSource.includes('class="atlas-hero"'));
 assert.ok(appSource.includes('id="startBtn"'));
 assert.ok(appSource.includes('id="startBottomBtn"'));
 assert.ok(appSource.includes('id="como-jogar"'));
-assert.ok(appSource.includes('Três temas'));
+assert.ok(!appSource.includes('Três temas, <em>30 descobertas.</em>'));
 assert.ok(appSource.includes('Pantanal'));
 assert.ok(readFileSync('style.css','utf8').includes('HOME V5'));
 assert.ok(readFileSync('index.html','utf8').includes('topbar topbar-v3'));
@@ -166,7 +166,7 @@ console.log('✓ Sessões permanecem salvas no aparelho e não são apagadas por
 
 // Centro-Oeste completo, destaques locais e sessão mantida na primeira tela.
 for(const place of ['Goiás','Mato Grosso','Mato Grosso do Sul','Distrito Federal'])assert.ok(appSource.includes(place),'Faltou '+place);
-for(const art of ['assets/cerrado.svg','assets/pantanal.svg','assets/cavalhadas.svg','assets/pequi.svg'])assert.ok(appSource.includes(art),'Faltou imagem '+art);
+assert.ok(appSource.includes('atlas-hero-photo'),'A imagem principal do Pantanal precisa continuar');
 assert.ok(appSource.includes('atlas-session')&&appSource.includes('atlasSignOut'));
 assert.ok(appSource.includes("visitor?'Continuar jogando':'Começar o desafio'"));
 assert.ok(appSource.includes('Centro-Oeste'));
@@ -232,3 +232,21 @@ for(const excluded of ['Bonito','Corumbá','Nobres','Caldas Novas','Pirenópolis
 }
 assert.deepEqual(tourismQuestions.map(q=>'ABCD'[q.correct]),["B","C","C","B","A","A","A","C","B","C"]);
 console.log('✓ Turismo revisado: 5 Chapada, 3 Brasília, 2 gerais; banco fechado de 30.');
+
+
+// Regressão: homepage simplificada não deve mostrar métricas nem seções removidas.
+const homeStart=appSource.indexOf('function home(){');
+const homeEnd=appSource.indexOf('async function start(){',homeStart);
+assert.ok(homeStart>=0&&homeEnd>homeStart);
+const homepage=appSource.slice(homeStart,homeEnd);
+for(const unused of [
+ 'atlas-metrics','atlas-explore','atlas-themes',
+ '01 · DESCUBRA A REGIÃO','02 · O CONHECIMENTO É A VIAGEM',
+ '30 PERGUNTAS OFICIAIS','BANCO FECHADO'
+])assert.ok(!homepage.includes(unused),'Bloco que deveria ser removido: '+unused);
+assert.ok(homepage.includes('01 · SUA VEZ DE PARTICIPAR'));
+assert.ok(homepage.includes('id="startBtn"')&&homepage.includes('id="startBottomBtn"'));
+assert.ok(homepage.includes('id="como-jogar"'));
+assert.ok(homepage.includes('atlas-hero-photo'));
+assert.ok(homepage.includes('atlasSignOut'));
+console.log('✓ Homepage simplificada: apenas hero e Como jogar como seção 01, sem métricas.');

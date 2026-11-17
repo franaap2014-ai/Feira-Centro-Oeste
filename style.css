@@ -356,3 +356,7 @@ body{background:#fffdfd;color:var(--v3-ink)}
 .closed-answers li.correct{background:#f1faf4;border-color:#b8daca;color:#245d41}
 .closed-answers li.correct strong{color:#23774b;font-size:10px}
 @media(max-width:750px){.closed-question-grid{grid-template-columns:1fr}.closed-question{padding:15px}}
+
+/* Tela inicial simplificada: apresentação seguida diretamente de Como jogar. */
+.atlas-home>.atlas-how{margin-top:clamp(25px,4.5vw,57px)}
+@media(max-width:680px){.atlas-home>.atlas-how{margin-top:26px}}
