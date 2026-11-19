@@ -360,3 +360,7 @@ body{background:#fffdfd;color:var(--v3-ink)}
 /* Tela inicial simplificada: apresentação seguida diretamente de Como jogar. */
 .atlas-home>.atlas-how{margin-top:clamp(25px,4.5vw,57px)}
 @media(max-width:680px){.atlas-home>.atlas-how{margin-top:26px}}
+
+/* Cadastro e entrada por username ou endereço de e-mail */
+.guest-field-help{font-size:11px;line-height:1.5;color:#9b7689;margin:-2px 0 6px;display:block}
+#guestUsername{min-width:0}

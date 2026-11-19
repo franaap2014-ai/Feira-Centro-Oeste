@@ -1,5 +1,12 @@
 import {createGuestAccount,loginGuestAccount,logoutGuestAccount,getGuestAccount} from './backend.js';
 const STORAGE_KEY='csa-quiz-user-session-v2';
+// Email is used only as a login identifier. The server creates a private
+// display nickname for e-mail registrations so the address never appears in scores.
+export function isValidGuestIdentifier(value){
+ const identifier=String(value??'').trim();
+ return /^[A-Za-z0-9_]{3,24}$/.test(identifier)||
+  (identifier.length<=160&&/^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/i.test(identifier));
+}
 let adminAccess=()=>{},onGuestChange=()=>{};
 export function getVisitor(){
  try{
@@ -41,8 +48,9 @@ function draw(){
  }
  const creating=mode==='create';
  title.textContent=creating?'Criar conta':'Entrar na conta';
- controls.innerHTML='<label for="guestUsername">Username</label>'+
- '<input id="guestUsername" name="username" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]{3,24}" required placeholder="Escolha seu username" />'+
+ controls.innerHTML='<label for="guestUsername">Nome de usuário ou e-mail</label>'+
+ '<input id="guestUsername" name="username" type="text" autocomplete="username" minlength="3" maxlength="160" required placeholder="'+(creating?'Escolha um nome ou digite seu e-mail':'Digite seu nome ou e-mail')+'" aria-describedby="guestIdentifierHelp" />'+
+ '<small id="guestIdentifierHelp" class="guest-field-help">Use letras, números ou _ (3 a 24 caracteres); também aceitamos e-mail. Seu endereço não aparece no placar.</small>'+
  '<label for="guestPassword">Senha</label>'+
  '<input id="guestPassword" name="password" type="password" autocomplete="'+(creating?'new-password':'current-password')+'" minlength="10" maxlength="72" required placeholder="Digite sua senha" />'+
  (creating?'<label for="guestPasswordRepeat">Repetir senha</label>'+
@@ -51,7 +59,7 @@ function draw(){
  actions.innerHTML='<button type="button" id="guestSwitch" class="guest-text-action">'+
  (creating?'Já tem uma conta? <strong>Entre</strong>':'Não tem conta? <strong>Criar conta</strong>')+'</button>'+
  '<button type="button" id="guestAdmin" class="guest-text-action guest-admin-action">Acesso de ADM</button>'+
- '<small>Cadastro sem e-mail. Você permanece conectado neste aparelho por até 90 dias sem atividade.</small>';
+ '<small>O e-mail é opcional e funciona apenas como identificador, sem verificação ou recuperação de senha. Se usá-lo, aparecerá um apelido de jogador. A conta fica conectada neste aparelho por até 90 dias sem atividade.</small>';
  document.getElementById('guestSwitch').onclick=()=>{mode=creating?'login':'create';draw();document.getElementById('guestUsername').focus()};
  document.getElementById('guestAdmin').onclick=()=>{dialog.close();adminAccess()};
  document.getElementById('guestUsername').focus();
@@ -76,6 +84,11 @@ export function initGuestUI({onAdminAccess,onGuestChanged}={}){
   const username=document.getElementById('guestUsername').value.trim();
   const password=document.getElementById('guestPassword').value;
   const button=document.getElementById('guestAccountSubmit'),status=document.getElementById('guestAccountStatus');
+  if(!isValidGuestIdentifier(username)){
+   status.textContent='Digite um nome de 3 a 24 caracteres (letras, números ou _) ou um endereço de e-mail válido.';
+   document.getElementById('guestUsername').focus();
+   return;
+  }
   if(mode==='create'&&password!==document.getElementById('guestPasswordRepeat').value){
    status.textContent='As senhas não coincidem.';return;
   }

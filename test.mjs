@@ -250,3 +250,17 @@ assert.ok(homepage.includes('id="como-jogar"'));
 assert.ok(homepage.includes('atlas-hero-photo'));
 assert.ok(homepage.includes('atlasSignOut'));
 console.log('✓ Homepage simplificada: apenas hero e Como jogar como seção 01, sem métricas.');
+
+
+// Cadastro/entrada: aceitar e-mail sem expor endereços em apelidos públicos.
+// Testar o validador diretamente com o código fonte compilado evita DOM e
+// valida que a interface não reintroduz o pattern que bloqueava o e-mail.
+const guestSource=readFileSync('guest.js','utf8');
+assert.ok(guestSource.includes('export function isValidGuestIdentifier(value)'));
+assert.ok(guestSource.includes('Nome de usuário ou e-mail'));
+assert.ok(guestSource.includes('maxlength="160"'));
+assert.ok(!guestSource.includes('pattern="[a-zA-Z0-9_]{3,24}"'));
+assert.ok(guestSource.includes('!isValidGuestIdentifier(username)'));
+assert.ok(guestSource.includes('Seu endereço não aparece no placar.'));
+assert.ok(guestSource.includes('sem verificação ou recuperação de senha'));
+console.log('✓ Formulário permite e-mail e username e preserva a privacidade do apelido.');

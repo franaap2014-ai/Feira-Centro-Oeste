@@ -120,7 +120,8 @@ export async function changeCurrentPassword(password){
 }
 
 
-// Cadastro e login comum por username/senha, separados do Supabase Auth administrativo.
+// Cadastro e login comum por nome de usuário OU identificador de e-mail, separados do Supabase Auth administrativo.
+ // Para cadastros com e-mail, o servidor cria um apelido público e não exibe o endereço.
 // O servidor armazena somente um hash bcrypt da senha e um hash do token de sessão.
 async function guestRpc(fn,payload){
  const result=await request('/rest/v1/rpc/'+fn,{method:'POST',body:payload});
